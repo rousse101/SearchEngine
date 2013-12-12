@@ -68,6 +68,14 @@ public class RawsAnalyzer {
 				String content = readRawContent(bfReader);
 				
 				System.out.println("the offset in " + fileName +" is: " + offset);
+				System.out.println("the url is " + url);
+//				System.out.println("the content is " + content);
+//				try {
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				String contentMD5 = md5.getMD5ofStr(content);
 				page.setPage(url, oldOffset, contentMD5, fileName);
 				page.add2DB(dbc);

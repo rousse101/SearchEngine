@@ -165,6 +165,7 @@ public class originalPageGetter {
 		try {	
 			bfReader.readLine();    //version
 			urlFromHead = bfReader.readLine();
+			System.out.println("url:"+urlFromHead);
 			headStr += urlFromHead;
 			if(urlFromHead != null)
 				urlFromHead = urlFromHead.substring(urlFromHead.indexOf(":")+1, urlFromHead.length());

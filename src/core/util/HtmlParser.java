@@ -12,6 +12,26 @@ public class HtmlParser {
 	public HtmlParser(){}
 	
 	//&quot;&nbsp;
+	public String htmlCode(String htmlDoc)
+	{
+		final String patternString = "<meta[^>]*charset=([^>]*\\s*>)";   		
+		Pattern pattern = Pattern.compile(patternString,Pattern.CASE_INSENSITIVE);   
+		Matcher matcher = pattern.matcher(htmlDoc);
+		String tempURL;
+		//初次匹配到的url是形如：<a href="http://bbs.life.sina.com.cn/" target="_blank">
+		//为此，需要进行下一步的处理，把真正的url抽取出来，可以对于前两个"之间的部分进行记录得到url
+		if(matcher.find())
+		{
+//			System.out.println("匹配上了");
+			tempURL = matcher.group(1);
+			if(tempURL==null)return "utf-8";
+			tempURL = tempURL.replace("\"","");
+			tempURL = tempURL.replace("/","");
+			tempURL = tempURL.replace(">","");
+			return tempURL.trim();
+		}
+		return "utf-8";
+	}
 	public String html2Text(String inputString) 
 	{    	
 		String htmlStr = inputString; //含html标签的字符串    
@@ -26,7 +46,7 @@ public class HtmlParser {
 	    	String regEx_style = "<style[^>]*?>[\\s\\S]*?</style>"; 
 	    	//定义HTML标签的正则表达式 
 	    	String regEx_html = "<[^>]+>";
-	        String[] filter = {"&quot;", "&nbsp;"};
+	        String[] filter = {"&quot;", "&nbsp;","&lt;","&gt;"};
 	    	
 	        p_script = Pattern.compile(regEx_script,Pattern.CASE_INSENSITIVE);    
 	        m_script = p_script.matcher(htmlStr);    

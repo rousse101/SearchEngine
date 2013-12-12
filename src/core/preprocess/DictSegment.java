@@ -1,5 +1,6 @@
 package core.preprocess;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -38,16 +39,38 @@ public class DictSegment {
 	{
 		//第一步操作，把html的文件用正则表达式处理，去掉标签等无用信息，保留文本进行操作
 		HtmlParser parser = new HtmlParser();
-		String htmlText = parser.html2Text(htmlDoc);
+		String temp=null;
+		try {
+			temp = (new String(htmlDoc.getBytes("GBK"),parser.htmlCode(htmlDoc)));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String htmlText = parser.html2Text(temp);
+//		System.out.println("编码"+parser.htmlCode(htmlDoc));
 		
 		//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
 		ArrayList<String> sentances = cutIntoSentance(htmlText);
+		
 		ArrayList<String> segResult = new ArrayList<String>();
 		for(int i = 0; i < sentances.size(); i++)
 		{
+			//TODO 这里先分段，在分词。分词被我删除掉。
+//			考虑两点
 			segResult.addAll(cutIntoWord(sentances.get(i)));
+//			segResult.add(sentances.get(i));
 		}
-		
+//		if(segResult.size()<1){
+//			System.out.println("编码"+parser.htmlCode(htmlDoc));
+//	    	for(String word: sentances){
+////	    		//		    			iso8859-1,(new String(word.getBytes("GBK"),"utf-8"))
+////				try {
+////					System.out.println("word:"+(new String(word.getBytes("GBK"),"UTF-8")));
+////				} catch (UnsupportedEncodingException e) {
+////					// TODO Auto-generated catch block
+////					e.printStackTrace();
+////				}
+//	    	}
+//	    }
 		return segResult;
 	}
 	
@@ -62,7 +85,7 @@ public class DictSegment {
         //以空格符、","、"."及"!"作为定界符
 		ArrayList<String> sentance = new ArrayList<String>();
 		
-		String token = "。，、；：？！“”‘’《》（）-";
+		String token = " |。，、；：？！“”‘’《》（）-\t\n\r\f";
 	    StringTokenizer tokenizer = new StringTokenizer(htmlDoc,token);
 
 	    //获取字符串str1中语言符号的个数
@@ -70,8 +93,7 @@ public class DictSegment {
 	    
 	    //利用循环来获取字符串str1中下一个语言符号,并输出
 	    while(tokenizer.hasMoreTokens()) 
-	    	sentance.add(tokenizer.nextToken());
-
+	    	sentance.add(tokenizer.nextToken().trim());
 		return sentance;
 	}
 	

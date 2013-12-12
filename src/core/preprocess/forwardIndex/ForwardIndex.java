@@ -1,5 +1,6 @@
 package core.preprocess.forwardIndex;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -53,7 +54,7 @@ public class ForwardIndex {
 			System.out.println("in the process of creating forwardIndex: ");
 			while (rs.next()) {				
 				url = rs.getString("url"); // 选择sname这列数据
-				System.out.println(url);
+//				System.out.println(url);
 				
 				if(url.equals("http://www.sogou.com/")){
 					System.out.println();
@@ -65,6 +66,7 @@ public class ForwardIndex {
 				
 				segResult = dictSeg.SegmentFile(htmlDoc);
 				indexMap.put(url, segResult);
+//				System.out.println("词大小: " + segResult.size());
 			}
 
 			rs.close();
@@ -77,7 +79,8 @@ public class ForwardIndex {
 		
 		System.out.println("------------------------------------------------------------------------");
 		System.out.println("create forwardIndex finished!!");
-		System.out.println("the size of forwardIndex is : " + indexMap.size());
+		System.out.println("正向索引大小: " + indexMap.size());
+		
 		
 		return indexMap;
 	}
@@ -96,6 +99,12 @@ public class ForwardIndex {
 		    ArrayList<String> words = (ArrayList<String>) entry.getValue();
 
 		    System.out.println(url + " 对应的分词结果是： " + words.size());
+//		    if(words.size()<40){
+//		    	for(String word: words){
+//		    		//		    			(new String(word.getBytes("GBK"),"utf-8"))
+//					System.out.println("word:"+word);
+//		    	}
+//		    }
 		}
 		
 	}

@@ -38,9 +38,9 @@ public class testDBConnection {
 		String connent = "aabbbb";
 		String offset = "25";
 		String raws = "aa";
-		
-		String sql = "insert into pageindex(url, connent, offset, raws)" +
-				" values ('"+url+"', '"+connent+"', '"+offset+"', '"+raws+"')";
+		String sql ="delete from pageindex";
+//		String sql = "insert into pageindex(url, connent, offset, raws)" +
+//				" values ('"+url+"', '"+connent+"', '"+offset+"', '"+raws+"')";
 		//String sql = "insert into test values('"+url+"', '"+connent+"')";
 		dbc.executeUpdate(sql);
 	}

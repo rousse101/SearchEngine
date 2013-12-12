@@ -28,7 +28,7 @@ public class WebAnalyzer {
 		System.out.println(htmlDoc);
 		HtmlParser hp = new HtmlParser();
 		ArrayList<URL> urlInHtmlDoc = hp.urlDetector(htmlDoc);	
-		saveDoc(bfWriter, url,hp.html2Text(htmlDoc));
+		saveDoc(bfWriter, url,htmlDoc);
 		return urlInHtmlDoc;
 	}
 	

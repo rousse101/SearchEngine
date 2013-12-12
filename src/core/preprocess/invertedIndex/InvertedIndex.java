@@ -3,6 +3,7 @@ package core.preprocess.invertedIndex;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -86,12 +87,14 @@ public class InvertedIndex {
 		InvertedIndex invertedIndex = new InvertedIndex();
 		HashMap<String, ArrayList<String>> invertedIndexMap = invertedIndex.createInvertedIndex();
 		
-		String key = "的";
+		String key = "中国";
+		Date start = new Date();
 		ArrayList<String> urls = invertedIndexMap.get(key);
-		
+		Date end = new Date();
 		if(urls != null)
 		{
-			System.out.println("得到了结果如下：");
+			System.out.println("得到了"+urls.size()+"个结果,耗时"+(end.getTime()-start.getTime())+"ms");
+			
 			for(String url : urls)
 				System.out.println(url);
 		}
