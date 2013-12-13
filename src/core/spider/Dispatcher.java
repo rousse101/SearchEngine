@@ -15,7 +15,12 @@ public class Dispatcher {
 	public Dispatcher(ArrayList<URL> urls) {    
 		this.urls = urls; 
 	}    
-	
+	public boolean outofSize(){
+		if(urls.size()>5000){
+			return true;
+		}
+		return false;
+	}
 	public synchronized URL getURL()		
 	{
 		//堆栈无数据，不能出栈

@@ -103,7 +103,7 @@ public class HtmlParser {
 				//即使在之前的处理下，还是有可能发生意外的，比如，程序用的是相对的url
 				//这样，这个字符串就不可以用于url的初始化，我们先把这部分省略不考虑
 				//之后可以写一个补充host的方法将这些url补齐
-				if(tempURL.startsWith("http"))
+				if(tempURL.startsWith("http")&&tempURL.contains(".163."))
 					allURLs.add(new URL(tempURL));
 				
 				

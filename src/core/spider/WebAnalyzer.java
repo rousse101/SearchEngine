@@ -25,7 +25,7 @@ public class WebAnalyzer {
 	public ArrayList<URL> doAnalyzer(BufferedWriter bfWriter, URL url, String htmlDoc) {
 	
 		System.out.println("分析的文本大小: " + htmlDoc.length()/1024+"KB");
-		System.out.println(htmlDoc);
+		//System.out.println(htmlDoc);
 		HtmlParser hp = new HtmlParser();
 		ArrayList<URL> urlInHtmlDoc = hp.urlDetector(htmlDoc);	
 		saveDoc(bfWriter, url,htmlDoc);
