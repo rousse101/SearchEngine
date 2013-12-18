@@ -28,12 +28,11 @@ public class ResultGenerator {
 	public Result generateResult(String url) {
 		
 		Page page;
-		String content = "";		
+		String content ="";		
 		String date = "";
 		String title = "";
 		//String contentText = "";
 		String shortContent = "";
-		
 		page = pageGetter.getRawsInfo(url);
 		content = pageGetter.getContent(page.getRawName(), page.getOffset());
 		

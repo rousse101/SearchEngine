@@ -59,18 +59,25 @@ public class DictSegment {
 			segResult.addAll(cutIntoWord(sentances.get(i)));
 //			segResult.add(sentances.get(i));
 		}
-//		if(segResult.size()<1){
-//			System.out.println("±‡¬Î"+parser.htmlCode(htmlDoc));
+		if(segResult.size()<1&&sentances.size()>10){
+			System.out.println("±‡¬Î"+parser.htmlCode(htmlDoc));
+			System.out.println("∑÷¥ ∫Û“≥√Ê:\n"+htmlText);
 //	    	for(String word: sentances){
-////	    		//		    			iso8859-1,(new String(word.getBytes("GBK"),"utf-8"))
-////				try {
-////					System.out.println("word:"+(new String(word.getBytes("GBK"),"UTF-8")));
-////				} catch (UnsupportedEncodingException e) {
-////					// TODO Auto-generated catch block
-////					e.printStackTrace();
-////				}
+//	    		//		    			iso8859-1,(new String(word.getBytes("GBK"),"utf-8"))
+//				try {
+//					System.out.println("word:"+(new String(word.getBytes("GBK"),"UTF-8")));
+//				} catch (UnsupportedEncodingException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 //	    	}
-//	    }
+//	    	try {
+//				Thread.sleep(10000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+	    }
 		return segResult;
 	}
 	

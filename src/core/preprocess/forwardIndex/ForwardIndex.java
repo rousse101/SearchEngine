@@ -43,6 +43,7 @@ public class ForwardIndex {
 	
 	public HashMap<String, ArrayList<String>> createForwardIndex()
 	{
+		int num=0;
 		try {
 			ArrayList<String> segResult = new ArrayList<String>();
 			String sql = "select * from pageindex"; // 要执行的SQL语句
@@ -63,9 +64,17 @@ public class ForwardIndex {
 				fileName = rs.getString("raws");
 				offset = Integer.parseInt(rs.getString("offset"));
 				String htmlDoc = pageGetter.getContent(fileName, offset);
-				
+//				int last = indexMap.size();
 				segResult = dictSeg.SegmentFile(htmlDoc);
 				indexMap.put(url, segResult);
+//				int end = indexMap.size();
+//				while(end==last)
+//				{
+//						System.out.println("url\t"+url);
+//						System.out.println("segResult size\t"+segResult.size());
+//						Thread.sleep(10000);
+//					};
+				num++;
 //				System.out.println("词大小: " + segResult.size());
 			}
 
@@ -79,6 +88,7 @@ public class ForwardIndex {
 		
 		System.out.println("------------------------------------------------------------------------");
 		System.out.println("create forwardIndex finished!!");
+		System.out.println("循环的次数："+num);
 		System.out.println("正向索引大小: " + indexMap.size());
 		
 		
@@ -92,6 +102,7 @@ public class ForwardIndex {
 		ForwardIndex forwardIndex = new ForwardIndex();
 		HashMap<String, ArrayList<String>> indexMap = forwardIndex.createForwardIndex();
 		
+		int num=0;
 		for (Iterator iter = indexMap.entrySet().iterator(); iter.hasNext();) {
 			
 			Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对
@@ -99,13 +110,15 @@ public class ForwardIndex {
 		    ArrayList<String> words = (ArrayList<String>) entry.getValue();
 
 		    System.out.println(url + " 对应的分词结果是： " + words.size());
-//		    if(words.size()<40){
+		    if(words.size()<1){
 //		    	for(String word: words){
 //		    		//		    			(new String(word.getBytes("GBK"),"utf-8"))
 //					System.out.println("word:"+word);
-//		    	}
-//		    }
-		}
+		    	num++;
+		    	}
+		    }
+		System.out.println("最后结果:"+num);
+	
 		
 	}
 

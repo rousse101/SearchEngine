@@ -41,7 +41,7 @@ public class HtmlParser {
 	          
 	    try { 
 	    	//定义script正则式{或<script[^>]*?>[\s\S]*?<\/script> } 
-	    	String regEx_script = "<script[^>]*?>[\\s\\S]*?</script>";    
+	    	String regEx_script = "<no?script[^>]*?>[\\s\\S]*?</no?script>";    
 	    	//定义style正则式{或<style[^>]*?>[\s\S]*?<\/style> }    
 	    	String regEx_style = "<style[^>]*?>[\\s\\S]*?</style>"; 
 	    	//定义HTML标签的正则表达式 

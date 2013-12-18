@@ -2,6 +2,9 @@ package core.query;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import core.preprocess.DictSegment;
 import core.preprocess.invertedIndex.InvertedIndex;
 import core.util.Result;
@@ -9,8 +12,8 @@ import core.util.ResultGenerator;
 
 public class Response {
 
-	//倒排索引
-	private HashMap<String, ArrayList<String>> invertedIndexMap;
+	//倒排索引类
+	private InvertedIndex invertedIndex;
 	//返回结果列表
 	private ArrayList<Result> results;
 	
@@ -21,8 +24,8 @@ public class Response {
 	
 	public Response()
 	{
-		InvertedIndex invertedIndex = new InvertedIndex();
-		invertedIndexMap = invertedIndex.createInvertedIndex();
+		invertedIndex = new InvertedIndex();
+		invertedIndex.createInvertedIndex();
 		dictSeg = new DictSegment();
 		resultGenerator = new ResultGenerator();
 	}
@@ -55,11 +58,12 @@ public class Response {
 			System.out.println(keyWord);
 		System.out.println("分词结果显示结束啦 \n");
 		
-		ArrayList<String> resultUrl = new ArrayList<String>();
+		HashMap<String,Double> resultUrl = new HashMap<String,Double>();
+		HashMap<String,Double> resultTemp = new HashMap<String,Double>();
 		
-		ArrayList<String> resultTemp = new ArrayList<String>();
 		for(String keyWord : keyWords){
-			resultTemp = invertedIndexMap.get(keyWord);			
+			//调用索引类计算文档得分，方法是idf*tf值
+			resultTemp = invertedIndex.DocScore(keyWord);			
 			if(resultTemp != null){
 				resultUrl = mergeResultURL(resultUrl, resultTemp);
 			}	
@@ -68,16 +72,12 @@ public class Response {
 		try{
 		
 			if(resultUrl.size() != 0){
-			
 				System.out.println("查询结果的URL返回如下：");
-				for(String url : resultUrl)
-					System.out.println(url);
-		
 				// 3. 根据URL通过数据库获得网页所在位置，从而在RAWs中获得网页内容
-				// ArrayList<Page> pageList = new ArrayList<Page>();
-		
-				for(String url : resultUrl){
-				
+				//对已经计算得分的文档排序
+				//TODO 后续可以考虑控制返回文档的量级。
+				ArrayList<String>temp = invertedIndex.SortDoc(resultUrl);
+				for(String url : temp){
 					Result tempR = resultGenerator.generateResult(url);
 					if(tempR == null)
 						System.out.println(url + "对应的result为空！！！");
@@ -95,20 +95,26 @@ public class Response {
 			
 	}
 
-	private ArrayList<String> mergeResultURL(ArrayList<String> resultUrl,
-			ArrayList<String> resultTemp) {
+	private HashMap<String,Double> mergeResultURL(HashMap<String,Double> resultUrl,
+			HashMap<String,Double> resultTemp) {
 		//如果第一次执行，那么resultUrl还是空的，直接返回resultTemp就可以
 		if(resultUrl.size() == 0)
 			return resultTemp;
 		
-		//否则需要合并两者的公共部分
-		ArrayList<String> RESULT = new ArrayList<String>();
-		for(String urlT : resultTemp)
+		//否则需要合并两者的公共部分,并且把文档得分相加
+		HashMap<String,Double> RESULT = new HashMap<String,Double>();
+		for (Iterator iter = resultTemp.entrySet().iterator(); iter.hasNext();) 
 		{
-			if(resultUrl.contains(urlT))
-				RESULT.add(urlT);
+			Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
+			String url = (String) entry.getKey();
+			double score =(Double)entry.getValue();
+			
+			if(resultUrl.containsKey(url))
+			{
+				double totalscore  = resultUrl.get(url)+score;
+				RESULT.put(url, totalscore);
+			}
 		}
-		
 		return RESULT;
 	}
 
@@ -118,7 +124,7 @@ public class Response {
 	public static void main(String[] args) {
 
 		Response response = new Response();
-		ArrayList<Result> results = response.getResponse("中国教育");
+		ArrayList<Result> results = response.getResponse("教育");
 		
 		System.out.println("返回结果如下：");
 		for(Result result : results)
