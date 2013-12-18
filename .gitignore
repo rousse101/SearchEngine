@@ -2,3 +2,7 @@
 /Dictionary
 /WebRoot/WEB-INF/classes
 /WebRoot/WEB-INF/lib
+/.project
+/.settings/org.eclipse.wst.jsdt.ui.superType.container
+/.settings/org.eclipse.wst.jsdt.ui.superType.name
+/.settings/.jsdtscope

@@ -1,8 +1,5 @@
 package test;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import core.util.DBConnection;
 
 public class testDBConnection {
@@ -43,5 +40,6 @@ public class testDBConnection {
 //				" values ('"+url+"', '"+connent+"', '"+offset+"', '"+raws+"')";
 		//String sql = "insert into test values('"+url+"', '"+connent+"')";
 		dbc.executeUpdate(sql);
+		System.out.println("数据库已全部清空");
 	}
 }

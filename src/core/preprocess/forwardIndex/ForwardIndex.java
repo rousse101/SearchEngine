@@ -64,10 +64,8 @@ public class ForwardIndex {
 				fileName = rs.getString("raws");
 				offset = Integer.parseInt(rs.getString("offset"));
 				String htmlDoc = pageGetter.getContent(fileName, offset);
-//				int last = indexMap.size();
 				segResult = dictSeg.SegmentFile(htmlDoc);
 				indexMap.put(url, segResult);
-//				int end = indexMap.size();
 //				while(end==last)
 //				{
 //						System.out.println("url\t"+url);
@@ -97,8 +95,6 @@ public class ForwardIndex {
 	
 
 	public static void main(String[] args) {
-		
-
 		ForwardIndex forwardIndex = new ForwardIndex();
 		HashMap<String, ArrayList<String>> indexMap = forwardIndex.createForwardIndex();
 		
@@ -110,16 +106,7 @@ public class ForwardIndex {
 		    ArrayList<String> words = (ArrayList<String>) entry.getValue();
 
 		    System.out.println(url + " 对应的分词结果是： " + words.size());
-		    if(words.size()<1){
-//		    	for(String word: words){
-//		    		//		    			(new String(word.getBytes("GBK"),"utf-8"))
-//					System.out.println("word:"+word);
-		    	num++;
-		    	}
 		    }
-		System.out.println("最后结果:"+num);
-	
-		
 	}
 
 }

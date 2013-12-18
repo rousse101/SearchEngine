@@ -21,7 +21,6 @@ public class URLClient {
 		try {
 			URLConnection conn = hostURL.openConnection();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			
 			String line = null;
 			while((line = reader.readLine()) != null)
 			{

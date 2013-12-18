@@ -41,6 +41,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<table border="0" height="30px" width="450px" align="center">		
 		<tr>
 			<td><img src="dySE-logo.jpg" /></td>
+			<a href ="search.jsp?keyword=<%=keyword%>&model=1">按时间排序</a>
 			<td width ="66%"><input name="keyword" type="text" 
 				maxlength="100" id="textArea" value=<%=keyword%>></td>
 			<td height="29" align="center"><input type="submit" value="搜索一下" id = "search"></td>
@@ -53,7 +54,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<%  
 		Response resp = new Response();
 		ArrayList<Result> results = resp.getResponse(keyword);
-		
 		System.out.println("返回结果如下：");
 		for(Result result : results)
 		{

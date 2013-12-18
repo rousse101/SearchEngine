@@ -41,7 +41,7 @@ public class HtmlParser {
 	          
 	    try { 
 	    	//定义script正则式{或<script[^>]*?>[\s\S]*?<\/script> } 
-	    	String regEx_script = "<no?script[^>]*?>[\\s\\S]*?</no?script>";    
+	    	String regEx_script = "<(?:no)?script[^>]*?>[\\s\\S]*?</(?:no)?script>";    
 	    	//定义style正则式{或<style[^>]*?>[\s\S]*?<\/style> }    
 	    	String regEx_style = "<style[^>]*?>[\\s\\S]*?</style>"; 
 	    	//定义HTML标签的正则表达式 
@@ -78,8 +78,13 @@ public class HtmlParser {
 	}
 	
 	//URL还需要做的工作，去除一些无用链接，修复一些相对路径的链接
-	public ArrayList<URL> urlDetector(String htmlDoc)
+	public ArrayList<URL> urlDetector(String htmlDoc,URL url)
 	{
+		String str2 = url.toString();
+		System.out.println("传入的url"+str2);
+		String pos = str2.substring(7);
+        String start= str2.substring(0,7+pos.indexOf("/"));
+        System.out.println("文本前缀是"+start);
 		final String patternString = "<[a|A]\\s+href=([^>]*\\s*>)";   		
 		Pattern pattern = Pattern.compile(patternString,Pattern.CASE_INSENSITIVE);   
 		
@@ -103,10 +108,10 @@ public class HtmlParser {
 				//即使在之前的处理下，还是有可能发生意外的，比如，程序用的是相对的url
 				//这样，这个字符串就不可以用于url的初始化，我们先把这部分省略不考虑
 				//之后可以写一个补充host的方法将这些url补齐
-				if(tempURL.startsWith("http")&&tempURL.contains(".163."))
+				if(tempURL.startsWith(start)){
+					System.out.println("得到的结果URL;"+tempURL);
 					allURLs.add(new URL(tempURL));
-				
-				
+				}
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}

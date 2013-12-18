@@ -156,7 +156,7 @@ public class InvertedIndex {
 		InvertedIndex invertedIndex = new InvertedIndex();
 		invertedIndex.createInvertedIndex();
 		
-		String key = "教育";
+		String key = "习近平";
 		HashMap<String,Double> urls = invertedIndex.DocScore(key);
 		Date end  = new Date();
 		if(urls != null)

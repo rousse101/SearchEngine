@@ -41,11 +41,14 @@ public class Gather implements Runnable {
 		while(counter++ <= 10)		//每个线程提取100个网页
 		{
 			URL url = disp.getURL();
+			System.out.println(url);
 			System.out.println("线程号 " + ID + "\tURL为: " + url.toString());
 			String htmlDoc = client.getDocumentAt(url);
+			System.out.println("what");
 			if(htmlDoc.length() != 0)
 			{
-				ArrayList<URL> newURL = analyzer.doAnalyzer(bfWriter, url, htmlDoc);	
+				ArrayList<URL> newURL = analyzer.doAnalyzer(bfWriter, url, htmlDoc);
+				System.out.println("Ok");
 				if(newURL.size() != 0&&!disp.outofSize())
 					disp.insert(newURL);
 				System.out.println("URL分析完毕");

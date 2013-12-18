@@ -15,7 +15,7 @@ public class testDictSegment {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String dictFile = "test\\testHtml.txt";
+		String dictFile = "Raws\\test.txt";
 		try {
 			FileReader fileReader = new FileReader(dictFile);
 			BufferedReader bfReader = new BufferedReader(fileReader);

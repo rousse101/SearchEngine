@@ -95,9 +95,10 @@ public class testSubString {
 //		System.out.println(result);
 		
 		String str = "¶­";
-		String str2 = "abcdefg";
-
-		System.out.println(str2.length());
+		String str3 = "abcdefg";
+        String str2 ="http://analytics.163.com/ntes_clck?urlid=454&sign=c03a07caa005eecc65356644a11332ba&url=https%3A%2F%2Fepay.163.com%2Findex.jsp#f=topnav";
+		String pos = str2.substring(7);
+        System.out.println(str2.substring(0,7+pos.indexOf("/")));
 		
 	}
 

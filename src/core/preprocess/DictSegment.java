@@ -1,9 +1,14 @@
 package core.preprocess;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
+
+import org.wltea.analyzer.core.IKSegmenter;
+import org.wltea.analyzer.core.Lexeme;
 
 import configure.Configuration;
 
@@ -46,8 +51,6 @@ public class DictSegment {
 			e.printStackTrace();
 		}
 		String htmlText = parser.html2Text(temp);
-//		System.out.println("编码"+parser.htmlCode(htmlDoc));
-		
 		//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
 		ArrayList<String> sentances = cutIntoSentance(htmlText);
 		
@@ -56,7 +59,7 @@ public class DictSegment {
 		{
 			//TODO 这里先分段，在分词。分词被我删除掉。
 //			考虑两点
-			segResult.addAll(cutIntoWord(sentances.get(i)));
+			segResult.addAll(cutIntoWord(sentances.get(i),true));
 //			segResult.add(sentances.get(i));
 		}
 		if(segResult.size()<1&&sentances.size()>10){
@@ -106,6 +109,26 @@ public class DictSegment {
 	
 	//如果一句话中含有字母或者数字，这些应该不用切分掉，这个还没处理
 	//过滤停用词，过滤单字
+	public ArrayList<String> cutIntoWord(String sentance,Boolean model){
+		if(model==false){
+			return cutIntoWord(sentance,true);
+		}
+		else
+		{
+			ArrayList<String> result = new ArrayList<String>();
+			StringReader sr = new StringReader(sentance);
+			IKSegmenter ik=new IKSegmenter(sr, true); 
+			Lexeme lex=null; 
+			try {
+				while((lex=ik.next())!=null){
+					result.add(lex.getLexemeText());
+				}
+			} catch (IOException e) {
+				return result;
+			}
+			return result;
+		}
+	}
 	public ArrayList<String> cutIntoWord(String sentance)
 	{	
 		int currLen = 0;
@@ -139,7 +162,6 @@ public class DictSegment {
 		//System.out.println(result);		
 		return sentanceSegResult;
 	}
-	
 	/**
 	 * @param args
 	 */

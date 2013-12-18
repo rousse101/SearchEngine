@@ -32,7 +32,7 @@ public class DictReader {
 			e.printStackTrace();
 		}
 		
-		System.out.println("the size of dictionary is: " + dictionary.size());
+//		System.out.println("the size of dictionary is: " + dictionary.size());
 //		Iterator iter = dictionary.iterator();
 //		int count = 20;
 //		while(iter.hasNext() && count-- >= 0)

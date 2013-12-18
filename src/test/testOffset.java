@@ -20,7 +20,7 @@ public class testOffset {
 	 */
 	public static void main(String[] args) {
 
-		String dictFile = "test\\testSpace.txt";
+		String dictFile = "Raws\\test.txt";
 		try {
 			FileReader fileReader = new FileReader(dictFile);
 			BufferedReader bfReader = new BufferedReader(fileReader);
