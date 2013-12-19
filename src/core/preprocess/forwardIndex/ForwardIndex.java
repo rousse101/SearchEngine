@@ -13,6 +13,7 @@ import java.util.Map;
 
 import core.preprocess.DictSegment;
 import core.preprocess.index.originalPageGetter;
+import core.preprocess.invertedIndex.WordFiled;
 import core.util.DBConnection;
 
 /************************************************* 
@@ -34,18 +35,18 @@ ForwardIndex类建立网页正向索引，对应关系为url映射到网页所含词组,为倒排索引做准备
 public class ForwardIndex {
 
 	private DBConnection dbc = new DBConnection();
-	private HashMap<String, ArrayList<String>> indexMap = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, ArrayList<WordFiled>> indexMap = new HashMap<String, ArrayList<WordFiled>>();
 	private originalPageGetter pageGetter = new originalPageGetter();
 	private DictSegment dictSeg = new DictSegment();
 	
 	public ForwardIndex()
 	{}
 	
-	public HashMap<String, ArrayList<String>> createForwardIndex()
+	public HashMap<String, ArrayList<WordFiled>> createForwardIndex()
 	{
 		int num=0;
 		try {
-			ArrayList<String> segResult = new ArrayList<String>();
+			ArrayList<WordFiled> segResult = new ArrayList<WordFiled>();
 			String sql = "select * from pageindex"; // 要执行的SQL语句
 			ResultSet rs = dbc.executeQuery(sql);
 			String url,fileName;
@@ -96,14 +97,14 @@ public class ForwardIndex {
 
 	public static void main(String[] args) {
 		ForwardIndex forwardIndex = new ForwardIndex();
-		HashMap<String, ArrayList<String>> indexMap = forwardIndex.createForwardIndex();
+		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.createForwardIndex();
 		
 		int num=0;
 		for (Iterator iter = indexMap.entrySet().iterator(); iter.hasNext();) {
 			
 			Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对
 		    String url = (String) entry.getKey();
-		    ArrayList<String> words = (ArrayList<String>) entry.getValue();
+		    ArrayList<WordFiled> words = (ArrayList<WordFiled>) entry.getValue();
 
 		    System.out.println(url + " 对应的分词结果是： " + words.size());
 		    }

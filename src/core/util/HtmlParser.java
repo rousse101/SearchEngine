@@ -32,6 +32,20 @@ public class HtmlParser {
 		}
 		return "utf-8";
 	}
+	public String htmlTitle(String inputString){
+		String regEx_title = "<title[^>]*?>[\\s\\S]*?</title>"; 
+		Pattern p_title = Pattern.compile(regEx_title,Pattern.CASE_INSENSITIVE);
+		Matcher m_title = p_title.matcher(inputString); 
+		String title = null;
+		while(m_title.find())
+		{
+			title = m_title.group();   
+			//取其中第1个'>'和第二个'<'之间的文字
+			title = title.substring(title.indexOf(">")+1, title.lastIndexOf("<"));
+			break;
+		}
+		return title;
+	}
 	public String html2Text(String inputString) 
 	{    	
 		String htmlStr = inputString; //含html标签的字符串    
@@ -44,6 +58,7 @@ public class HtmlParser {
 	    	String regEx_script = "<(?:no)?script[^>]*?>[\\s\\S]*?</(?:no)?script>";    
 	    	//定义style正则式{或<style[^>]*?>[\s\S]*?<\/style> }    
 	    	String regEx_style = "<style[^>]*?>[\\s\\S]*?</style>"; 
+	    	
 	    	//定义HTML标签的正则表达式 
 	    	String regEx_html = "<[^>]+>";
 	        String[] filter = {"&quot;", "&nbsp;","&lt;","&gt;"};

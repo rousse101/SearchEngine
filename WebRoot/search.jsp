@@ -12,7 +12,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   <head>
     <base href="<%=basePath%>">
     
-    <title>Search Result</title>
+    <title>搜索一下你就知道</title>
     
     <style>
 	#search{
@@ -40,11 +40,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <form action="search.jsp" name="search" method="get">
 	<table border="0" height="30px" width="450px" align="center">		
 		<tr>
-			<td><img src="dySE-logo.jpg" /></td>
+			
 			<a href ="search.jsp?keyword=<%=keyword%>&model=1">按时间排序</a>
 			<td width ="66%"><input name="keyword" type="text" 
 				maxlength="100" id="textArea" value=<%=keyword%>></td>
 			<td height="29" align="center"><input type="submit" value="搜索一下" id = "search"></td>
+			<td><img src="logo.jpg" /></td>
 		</tr>
 	</table>
 	</form>
@@ -58,7 +59,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		for(Result result : results)
 		{
 	%>	
-			<h2><a href=<%=result.getUrl()%>><%=result.getTitle()%></a></h2>
+			<h2><a href=<%=result.getUrl()%> target="_blank"><%=result.getTitle()%></a></h2>
 			<p><%=result.getContent()%><p>
 			<p><%=result.getUrl()%> &nbsp;&nbsp;&nbsp; <%=result.getDate()%><p>
 	<%  		

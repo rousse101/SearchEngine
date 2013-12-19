@@ -25,7 +25,7 @@ public class Response {
 	public Response()
 	{
 		invertedIndex = new InvertedIndex();
-//		invertedIndex.createInvertedIndex();
+		//invertedIndex.createInvertedIndex();
 		dictSeg = new DictSegment();
 		resultGenerator = new ResultGenerator();
 	}
@@ -124,7 +124,7 @@ public class Response {
 	public static void main(String[] args) {
 
 		Response response = new Response();
-		ArrayList<Result> results = response.getResponse("教育");
+		ArrayList<Result> results = response.getResponse("女人");
 		
 		System.out.println("返回结果如下：");
 		for(Result result : results)

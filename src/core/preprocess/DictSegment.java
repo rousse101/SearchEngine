@@ -12,6 +12,7 @@ import org.wltea.analyzer.core.Lexeme;
 
 import configure.Configuration;
 
+import core.preprocess.invertedIndex.WordFiled;
 import core.util.HtmlParser;
 
 //分词类,单例模式
@@ -40,7 +41,7 @@ public class DictSegment {
 	//流程，从htmlDoc中读取句子S，如果没有S了，算法结束
 	//如果还有，读取S，调用句子切词程序，切完继续读取S
 	//后续处理：剔除停用词，统计
-	public ArrayList<String> SegmentFile(String htmlDoc)
+	public ArrayList<WordFiled> SegmentFile(String htmlDoc)
 	{
 		//第一步操作，把html的文件用正则表达式处理，去掉标签等无用信息，保留文本进行操作
 		HtmlParser parser = new HtmlParser();
@@ -51,15 +52,26 @@ public class DictSegment {
 			e.printStackTrace();
 		}
 		String htmlText = parser.html2Text(temp);
+		String titleSentance = parser.htmlTitle(temp).trim();
+		System.out.println("title"+titleSentance);
 		//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
 		ArrayList<String> sentances = cutIntoSentance(htmlText);
-		
-		ArrayList<String> segResult = new ArrayList<String>();
+		ArrayList<WordFiled> segResult = new ArrayList<WordFiled>();
+		ArrayList<String> titles = cutIntoWord(titleSentance, true);
+		for(String s : titles){
+			WordFiled wf = new WordFiled(s,1);
+			segResult.add(wf);
+		}
 		for(int i = 0; i < sentances.size(); i++)
 		{
 			//TODO 这里先分段，在分词。分词被我删除掉。
 //			考虑两点
-			segResult.addAll(cutIntoWord(sentances.get(i),true));
+			ArrayList<String> words = cutIntoWord(sentances.get(i), true);
+			for(String s : words){
+				WordFiled wf = new WordFiled(s,0);
+				segResult.add(wf);
+			}
+			//segResult.addAll(cutIntoWord(sentances.get(i),true));
 //			segResult.add(sentances.get(i));
 		}
 		if(segResult.size()<1&&sentances.size()>10){

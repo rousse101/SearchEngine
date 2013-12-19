@@ -1,18 +1,38 @@
 package core.preprocess.invertedIndex;
-
-public class DocPos {
-    private String url=null; //文档名称
-    private int num=0; //文档中出现的次数
-    public void addTime(){
-    	num++;   //出现的次数加1
+/*
+ *@decription 文档中的词域
+ * */
+public class DocPos{
+	//词在该文档中的总次数
+    private int totalTime;
+    //词在标题中出现的总次数
+    private int titleTime;
+    //词在正文中出现的总次数
+    private int bodyTime;
+    public DocPos(){
+    	totalTime = titleTime = bodyTime =0;
     }
-	public String getUrl() {
-		return url;
+    public DocPos(int title,int body){
+    	titleTime = title;
+    	bodyTime =body;
+    	totalTime = title+body;
+    }
+	public int getTotalTime() {
+		return totalTime;
 	}
-	public void setUrl(String url) {
-		this.url = url;
+	public int getTitleTime() {
+		return titleTime;
 	}
-	public int getNum() {
-		return num;
+	public void setTitleTime(int titleTime) {
+		this.titleTime = titleTime;
+		this.totalTime = this.bodyTime+this.titleTime;
 	}
+	public int getBodyTime() {
+		return bodyTime;
+	}
+	public void setBodyTime(int bodyTime) {
+		this.bodyTime = bodyTime;
+		this.totalTime = this.bodyTime+this.titleTime;
+	}
+    
 }

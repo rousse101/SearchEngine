@@ -24,7 +24,7 @@ public class testParseHtml {
 	 */
 	public static void main(String[] args) {
 
-		String testFile = "Raws\\test.txt";
+		String testFile = "test\\test.txt";
 		HtmlParser parser = new HtmlParser();
 		originalPageGetter pageGetter = new originalPageGetter();
 		DictSegment dictSeg = new DictSegment();
@@ -38,8 +38,10 @@ public class testParseHtml {
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
-			
+		String title = parser.htmlTitle(htmlDoc);
 		String htmlText = parser.html2Text(temp);
+		
+		System.out.println("title:"+title);
 			//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
 			ArrayList<String> sentances = dictSeg.cutIntoSentance(htmlText);
 			segResult = new ArrayList<String>();

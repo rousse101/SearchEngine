@@ -33,10 +33,10 @@ public class testDictSegment {
 			htmlDoc = (new HtmlParser()).html2Text(htmlDoc);
 			
 			DictSegment seg = new DictSegment();
-			ArrayList<String> segResult = seg.SegmentFile(htmlDoc);
+			//HashMap<String> segResult = seg.SegmentFile(htmlDoc);
 			
 			int count = 0;
-			for(String temp : segResult)
+			//for(String temp : segResult)
 			{
 				if(count++ == 100)
 				{
@@ -44,7 +44,7 @@ public class testDictSegment {
 					count = 0;
 				}
 					
-				System.out.println(temp);
+			//	System.out.println(temp);
 			}
 	
 		} catch (FileNotFoundException e) {

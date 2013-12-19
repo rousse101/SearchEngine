@@ -33,11 +33,11 @@ InvertedIndex类建立网页倒排索引，对应关系为词组映射url，通过正向索引来建立
 
 public class InvertedIndex {
 
-	private HashMap<String, ArrayList<String>> fordwardIndexMap;
+	private HashMap<String, ArrayList<WordFiled>> fordwardIndexMap;
 //	private HashMap<String, ArrayList<String>> invertedIndexMap;
 	//添加了索引中的出现次数。利用hashmap存储文档和本文档中的次数。
-	private static HashMap<String, HashMap<String,Integer>> invertedIndexMap;
-	private int N=0;
+	private static HashMap<String, HashMap<String,DocPos>> invertedIndexMap;
+	private static int N=0;
 	
 	public InvertedIndex()
 	{
@@ -49,40 +49,64 @@ public class InvertedIndex {
 	public int GetTotalDocNum(){
 		return N;
 	}
-	public HashMap<String, HashMap<String,Integer>> createInvertedIndex() {
+	public HashMap<String, HashMap<String,DocPos>> createInvertedIndex() {
 		
-		invertedIndexMap = new HashMap<String, HashMap<String,Integer>>();
+		invertedIndexMap = new HashMap<String, HashMap<String,DocPos>>();
 		N = fordwardIndexMap.size();
 		//遍历原来的正向索引，进行倒排
 		for (Iterator iter = fordwardIndexMap.entrySet().iterator(); iter.hasNext();) 
 		{
 			Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
 			String url = (String) entry.getKey();
-			ArrayList<String> words = (ArrayList<String>) entry.getValue();
+			ArrayList<WordFiled> words = (ArrayList<WordFiled>) entry.getValue();
 //			获取文档的词总算
 			
 			String word;
 			for(int i = 0; i < words.size(); i++)
 			{
-				word = words.get(i);
+				WordFiled wf = words.get(i);
+				word = wf.getWord();
 				//倒排索引中还没有这个词，加入这个词，再把url链接上
 				if(!invertedIndexMap.containsKey(word))
 				{
-					HashMap<String,Integer> urls = new HashMap<String,Integer>();
-					urls.put(url, 1);
+					HashMap<String,DocPos> urls = new HashMap<String,DocPos>();
+					DocPos dp;
+					if(wf.getType()==0){
+						dp = new DocPos(0,1);
+					}
+					else{
+						dp = new DocPos(1,0);
+					}
+					urls.put(url, dp);
 					invertedIndexMap.put(word, urls);
 				}
 				//索引中已经含有这个文档，就把这个词频+1
 //				如果索引里没有这个文档，需要找到这个key从而把url链接上
 				else
 				{
-					HashMap<String, Integer> urls = invertedIndexMap.get(word);
-					if(!urls.containsKey(url))
-						urls.put(url, 1);
+					HashMap<String, DocPos> urls = invertedIndexMap.get(word);
+					if(!urls.containsKey(url)){
+						DocPos dp;
+						if(wf.getType()==0){
+							dp = new DocPos(0,1);
+						}
+						else{
+							dp = new DocPos(1,0);
+						}
+						urls.put(url, dp);
+					}
+						
 					else{
-						int num = urls.get(url);
-						num++;
-						urls.put(url, num);
+						DocPos dp = urls.get(url);
+						if(wf.getType()==0){
+							int num = dp.getBodyTime()+1;
+							dp.setBodyTime(num);
+						}
+						else{
+							int num = dp.getTitleTime()+1;
+							dp.setTitleTime(num);
+						}
+						urls.put(url, dp);
 					}
 				}
 			}
@@ -94,15 +118,17 @@ public class InvertedIndex {
 		return invertedIndexMap;
 	}
 
-	public HashMap<String,HashMap<String,Integer>> getInvertedIndex()
+	public HashMap<String,HashMap<String,DocPos>> getInvertedIndex()
 	{
 		return invertedIndexMap;
 	}
 	//计算文档的得分idf为出现词的文档数。
 	//idf*词出现的总数
 	public HashMap<String,Double> DocScore(String keyWord){
+		double Wtitle = 0.6;
+		double Wbody = 0.4;
 		HashMap<String,Double> result = new HashMap<String,Double>();
-		HashMap<String,Integer> urls = invertedIndexMap.get(keyWord);
+		HashMap<String,DocPos> urls = invertedIndexMap.get(keyWord);
 		if(urls != null)
 		{
 			double N = GetTotalDocNum();
@@ -112,7 +138,22 @@ public class InvertedIndex {
 			{
 				Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
 				String url = (String) entry.getKey();
-				double score = idf * ((Integer)entry.getValue());
+				DocPos dp  = (DocPos)entry.getValue();
+				double tf_title ,tf_body;
+				if(dp.getTitleTime()==0){
+					tf_title = 0;
+				}
+				else{
+					tf_title =1+ Math.log10(dp.getTitleTime());
+				}
+				if(dp.getBodyTime()==0){
+					tf_body =0;
+				}
+				else{
+					tf_body = 1+Math.log10(dp.getBodyTime());
+				}
+				double tf = Wtitle*tf_title+Wbody*tf_body;
+				double score = idf *tf;
 				result.put(url, score);
 			}
 			return result;
@@ -158,7 +199,7 @@ public class InvertedIndex {
 		InvertedIndex invertedIndex = new InvertedIndex();
 		invertedIndex.createInvertedIndex();
 		
-		String key = "习近平";
+		String key = "教育";
 		HashMap<String,Double> urls = invertedIndex.DocScore(key);
 		Date end  = new Date();
 		if(urls != null)
@@ -170,6 +211,11 @@ public class InvertedIndex {
 				String url = (String) entry.getKey();
 				double score =(Double)entry.getValue();
 				System.out.println("结果网页:"+url+"\t词频得分: "+score);
+			}
+			System.out.println("#################################");
+			System.out.println("排序");
+			for(String url:invertedIndex.SortDoc(urls)){
+				System.out.println("结果网页:"+url);
 			}
 //			for(String url : urls)
 				

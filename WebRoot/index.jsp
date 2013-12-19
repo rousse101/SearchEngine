@@ -11,7 +11,7 @@ String basePath = request.getScheme()+"://"
   <head>
     <base href="<%=basePath%>">
     
-    <title>dySE</title>
+    <title>пбнекякВ</title>
       
     <style>
 	#search{
@@ -30,7 +30,7 @@ String basePath = request.getScheme()+"://"
   </head>
   
   <body>
-	<p align="center"><img src="dySE-logo.jpg" /></p>
+	<p align="center"><img src="logo.jpg" /></p>
 	
 	
 	<form action="search.jsp" name="search" method="get" 
