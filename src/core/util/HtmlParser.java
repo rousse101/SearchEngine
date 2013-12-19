@@ -50,14 +50,16 @@ public class HtmlParser {
 	{    	
 		String htmlStr = inputString; //含html标签的字符串    
 		String textStr ="";    
-		Pattern p_script,p_style,p_html,p_filter;    
-		Matcher m_script,m_style,m_html,m_filter;      
+		Pattern p_script,p_style,p_html,p_href,p_filter;    
+		Matcher m_script,m_style,m_html,m_href,m_filter;      
 	          
 	    try { 
 	    	//定义script正则式{或<script[^>]*?>[\s\S]*?<\/script> } 
 	    	String regEx_script = "<(?:no)?script[^>]*?>[\\s\\S]*?</(?:no)?script>";    
 	    	//定义style正则式{或<style[^>]*?>[\s\S]*?<\/style> }    
 	    	String regEx_style = "<style[^>]*?>[\\s\\S]*?</style>"; 
+	    	String regEx_href = "<a[^>]*?>[\\s\\S]*?</a>"; 
+	    	
 	    	
 	    	//定义HTML标签的正则表达式 
 	    	String regEx_html = "<[^>]+>";
@@ -70,7 +72,11 @@ public class HtmlParser {
 	        p_style = Pattern.compile(regEx_style,Pattern.CASE_INSENSITIVE);    
 	        m_style = p_style.matcher(htmlStr);    
 	        htmlStr = m_style.replaceAll(""); //过滤style标签    
-	           
+	        
+	        p_href = Pattern.compile(regEx_href,Pattern.CASE_INSENSITIVE);    
+	        m_href = p_href.matcher(htmlStr);    
+	        htmlStr = m_href.replaceAll(""); //过滤style标签    
+	        
 	        p_html = Pattern.compile(regEx_html,Pattern.CASE_INSENSITIVE);    
 	        m_html = p_html.matcher(htmlStr);    
 	        htmlStr = m_html.replaceAll(""); //过滤html标签    
