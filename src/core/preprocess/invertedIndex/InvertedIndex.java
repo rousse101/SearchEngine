@@ -36,13 +36,15 @@ public class InvertedIndex {
 	private HashMap<String, ArrayList<String>> fordwardIndexMap;
 //	private HashMap<String, ArrayList<String>> invertedIndexMap;
 	//添加了索引中的出现次数。利用hashmap存储文档和本文档中的次数。
-	private HashMap<String, HashMap<String,Integer>> invertedIndexMap;
+	private static HashMap<String, HashMap<String,Integer>> invertedIndexMap;
 	private int N=0;
 	
 	public InvertedIndex()
 	{
-		ForwardIndex forwardIndex = new ForwardIndex();
-		fordwardIndexMap = forwardIndex.createForwardIndex();
+		if(invertedIndexMap==null){
+			ForwardIndex forwardIndex = new ForwardIndex();
+			fordwardIndexMap = forwardIndex.createForwardIndex();
+		}
 	}
 	public int GetTotalDocNum(){
 		return N;

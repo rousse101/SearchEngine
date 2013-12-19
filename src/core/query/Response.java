@@ -25,7 +25,7 @@ public class Response {
 	public Response()
 	{
 		invertedIndex = new InvertedIndex();
-		invertedIndex.createInvertedIndex();
+//		invertedIndex.createInvertedIndex();
 		dictSeg = new DictSegment();
 		resultGenerator = new ResultGenerator();
 	}
