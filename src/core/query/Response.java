@@ -21,18 +21,21 @@ public class Response {
 	private DictSegment dictSeg;
 	
 	private ResultGenerator resultGenerator;
-	
+	private int num;
 	public Response()
 	{
 		invertedIndex = new InvertedIndex();
 		//invertedIndex.createInvertedIndex();
 		dictSeg = new DictSegment();
+		num =0;
 		resultGenerator = new ResultGenerator();
 	}
-	
-	public ArrayList<Result> getResponse(String request)
+	public int getResultSize(){
+		return num;
+	}
+	public ArrayList<Result> getResponse(String request,int n)
 	{
-		doQuery(request);
+		doQuery(request,n);
 		return results;
 	}
 	
@@ -46,7 +49,7 @@ public class Response {
 	//注意点：
 	//1. 考虑性能的问题，如果网页库比较大，很可能回到只查询的缓慢和资源的大量消耗
 	//2. 考虑网页的排名问题
-	private void doQuery(String request) {
+	private void doQuery(String request,int N) {
 		
 		//1. 关键词分词、剔除停用词，并对分词结果进行查找对应的结果
 		//2. 合并各个分词的结果，返回初步的网页URL信息
@@ -57,7 +60,7 @@ public class Response {
 		for(String keyWord : keyWords)
 			System.out.println(keyWord);
 		System.out.println("分词结果显示结束啦 \n");
-		
+		System.out.println(invertedIndex.GetTotalDocNum());
 		HashMap<String,Double> resultUrl = new HashMap<String,Double>();
 		HashMap<String,Double> resultTemp = new HashMap<String,Double>();
 		
@@ -77,7 +80,10 @@ public class Response {
 				//对已经计算得分的文档排序
 				//TODO 后续可以考虑控制返回文档的量级。
 				ArrayList<String>temp = invertedIndex.SortDoc(resultUrl);
-				for(String url : temp){
+				this.num = temp.size();
+				int end = N*10 >temp.size() ? temp.size() : N*10;
+				for(int i =(N-1)*10 ;i <end; i ++){
+					String url = temp.get(i);
 					Result tempR = resultGenerator.generateResult(url);
 					if(tempR == null)
 						System.out.println(url + "对应的result为空！！！");
@@ -120,19 +126,20 @@ public class Response {
 
 	/**
 	 * @param args
+	 * 由于将索引构建放入Listneer中，所以目前该测试无法使用。
 	 */
 	public static void main(String[] args) {
 
-		Response response = new Response();
-		ArrayList<Result> results = response.getResponse("女人");
-		
-		System.out.println("返回结果如下：");
-		for(Result result : results)
-		{
-			System.out.println(result.getTitle());
-			System.out.println(result.getContent());
-			System.out.println(result.getUrl() + "  " + result.getDate());
-		}
+//		Response response = new Response();
+//		ArrayList<Result> results = response.getResponse("女人");
+//		
+//		System.out.println("返回结果如下：");
+//		for(Result result : results)
+//		{
+//			System.out.println(result.getTitle());
+//			System.out.println(result.getContent());
+//			System.out.println(result.getUrl() + "  " + result.getDate());
+//		}
 		
 	}
 

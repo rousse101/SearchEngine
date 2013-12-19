@@ -1,11 +1,12 @@
 package core.preprocess.forwardIndex;
 
-import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -94,12 +95,44 @@ public class ForwardIndex {
 		return indexMap;
 	}
 	
-
+	public Boolean WriteForwardIndex(HashMap<String, ArrayList<WordFiled>> indexMap){
+		try {
+			FileOutputStream outStream = new FileOutputStream("Index\\ForwardIndex.txt");
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream); 
+			objectOutputStream.writeObject(indexMap);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	public HashMap<String, ArrayList<WordFiled>>  ReaderForwardIndex(){
+		HashMap<String, ArrayList<WordFiled>> indexMap = new HashMap<String, ArrayList<WordFiled>>();
+		try {
+			FileInputStream freader = new FileInputStream("Index\\ForwardIndex.txt");
+			ObjectInputStream objectInputStream = new ObjectInputStream(freader);
+			try {
+				indexMap = (HashMap<String, ArrayList<WordFiled>>)objectInputStream.readObject();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return indexMap;
+		
+	}
 	public static void main(String[] args) {
 		ForwardIndex forwardIndex = new ForwardIndex();
-		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.createForwardIndex();
-		
-		int num=0;
+//		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.createForwardIndex();
+//		if(forwardIndex.WriteForwardIndex(indexMap))
+//			System.out.println("索引写入成功，请查看Index/ForwardIndex.txt！！");
+//		else
+//			System.out.println("索引写入失败！！");
+		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.ReaderForwardIndex();
+//		int num=0;
 		for (Iterator iter = indexMap.entrySet().iterator(); iter.hasNext();) {
 			
 			Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对

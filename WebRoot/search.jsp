@@ -33,15 +33,17 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   <body>
     
     <%	
-		String keyword = new String(request.getParameter("keyword").getBytes("ISO-8859-1"),"GB2312"); 	
+		//String keyword = new String(request.getParameter("keyword").getBytes("ISO-8859-1"),"GB2312");
+		String keyword=(String)session.getAttribute("keyword");
+		int totalnum=(Integer)session.getAttribute("pagenum");
+		int curnum=(Integer)session.getAttribute("curnum");
+		ArrayList<Result> results=(ArrayList<Result>)session.getAttribute("results"); 	
 	%>
-	
-	
-    <form action="search.jsp" name="search" method="get">
+    <form action="Search?model=0&CurrentNum=1" name="search" method="Post">
 	<table border="0" height="30px" width="450px" align="center">		
 		<tr>
 			
-			<a href ="search.jsp?keyword=<%=keyword%>&model=1">按时间排序</a>
+			<a href ="Search?keyword=<%=keyword%>&model=1&CurrentNum=1">按时间排序</a>
 			<td width ="66%"><input name="keyword" type="text" 
 				maxlength="100" id="textArea" value=<%=keyword%>></td>
 			<td height="29" align="center"><input type="submit" value="搜索一下" id = "search"></td>
@@ -49,13 +51,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		</tr>
 	</table>
 	</form>
-	
-	
-	
 	<%  
-		Response resp = new Response();
-		ArrayList<Result> results = resp.getResponse(keyword);
-		System.out.println("返回结果如下：");
 		for(Result result : results)
 		{
 	%>	
@@ -65,6 +61,21 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<%  		
 		}
 	%>
-    	
+	<h2 align="center">第
+	<%  
+		for(int i =1;i<=totalnum;i++)
+		{
+		if(i==curnum){
+			out.print(i);
+		}
+		else{
+		
+	%>	
+			<a href ="Search?keyword=<%=keyword%>&model=0&CurrentNum=<%=i%>"><%=i%></a>
+	<%  
+			}		
+		}
+	%>
+	页</h2>
   </body>
 </html>

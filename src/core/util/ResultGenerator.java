@@ -35,7 +35,7 @@ public class ResultGenerator {
 		String shortContent = "";
 		page = pageGetter.getRawsInfo(url);
 		content = pageGetter.getContent(page.getRawName(), page.getOffset());
-		
+		//content = page.getConnent();
 		//由于在之前的getContent中，调用readRawHead，之后再readRawHead
 		//所以date的产生式对应着的，因为date在readRawHead生产
 		date = pageGetter.getDate();

@@ -1,5 +1,13 @@
 package core.preprocess.invertedIndex;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+
+import configure.Configuration;
 
 import sun.misc.Compare;
 
@@ -39,18 +49,62 @@ public class InvertedIndex {
 	private static HashMap<String, HashMap<String,DocPos>> invertedIndexMap;
 	private static int N=0;
 	
-	public InvertedIndex()
-	{
-		if(invertedIndexMap==null){
-			ForwardIndex forwardIndex = new ForwardIndex();
-			fordwardIndexMap = forwardIndex.createForwardIndex();
-		}
-	}
 	public int GetTotalDocNum(){
 		return N;
 	}
-	public HashMap<String, HashMap<String,DocPos>> createInvertedIndex() {
+	public Boolean WriteIndex(HashMap<String, HashMap<String,DocPos>> invertedIndexMap,int N){
+		try {
+			Configuration conf = new Configuration();
+			FileOutputStream outStream = new FileOutputStream(conf.getValue("INDEXPATH")+"\\Index\\Index.txt");
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream); 
+			objectOutputStream.writeObject(invertedIndexMap);
+			objectOutputStream.close();
+			FileOutputStream outN = new FileOutputStream(conf.getValue("INDEXPATH")+"\\Index\\conf.txt");
+			PrintStream p=new PrintStream(outN);
+			p.print(""+N);
+			p.close();
+			outStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	public Boolean ReaderIndex(){
 		
+		invertedIndexMap =new  HashMap<String, HashMap<String,DocPos>>();
+		Configuration conf = new Configuration();
+		try {
+			FileInputStream freader = new FileInputStream(conf.getValue("INDEXPATH")+"\\Index\\Index.txt");
+			ObjectInputStream objectInputStream = new ObjectInputStream(freader);
+			try {
+				invertedIndexMap = (HashMap<String, HashMap<String,DocPos>>)objectInputStream.readObject();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				return false;
+			}
+			
+			FileReader fr = new FileReader(conf.getValue("INDEXPATH")+"\\Index\\conf.txt");
+			BufferedReader br = new BufferedReader(fr);
+			String s;
+			s = br.readLine();
+			System.out.println(s);
+			this.N= Integer.parseInt(s);
+			
+		}catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		if(invertedIndexMap.size()>0)
+		return true;
+		else 
+		return false;
+		
+	}
+	
+	public int createInvertedIndex() {
+		ForwardIndex forwardIndex = new ForwardIndex();
+		fordwardIndexMap = forwardIndex.ReaderForwardIndex();
 		invertedIndexMap = new HashMap<String, HashMap<String,DocPos>>();
 		N = fordwardIndexMap.size();
 		//遍历原来的正向索引，进行倒排
@@ -115,7 +169,7 @@ public class InvertedIndex {
 		System.out.println("***************************************************************");
 		System.out.println("create invertedIndex finished!!");
 		System.out.println("the size of invertedIndex is : " + invertedIndexMap.size());
-		return invertedIndexMap;
+		return N;
 	}
 
 	public HashMap<String,HashMap<String,DocPos>> getInvertedIndex()
@@ -153,6 +207,7 @@ public class InvertedIndex {
 					tf_body = 1+Math.log10(dp.getBodyTime());
 				}
 				double tf = Wtitle*tf_title+Wbody*tf_body;
+				System.out.println(tf);
 				double score = idf *tf;
 				result.put(url, score);
 			}
@@ -197,33 +252,35 @@ public class InvertedIndex {
 	public static void main(String[] args) {
 		Date start = new Date();
 		InvertedIndex invertedIndex = new InvertedIndex();
-		invertedIndex.createInvertedIndex();
+		int N = invertedIndex.createInvertedIndex();
+		invertedIndex.WriteIndex(invertedIndexMap,N);
 		
-		String key = "教育";
-		HashMap<String,Double> urls = invertedIndex.DocScore(key);
-		Date end  = new Date();
-		if(urls != null)
-		{
-			System.out.println("得到了"+urls.size()+"个结果,耗时"+(end.getTime()-start.getTime())+"ms");
-			for (Iterator iter = urls.entrySet().iterator(); iter.hasNext();) 
-			{
-				Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
-				String url = (String) entry.getKey();
-				double score =(Double)entry.getValue();
-				System.out.println("结果网页:"+url+"\t词频得分: "+score);
-			}
-			System.out.println("#################################");
-			System.out.println("排序");
-			for(String url:invertedIndex.SortDoc(urls)){
-				System.out.println("结果网页:"+url);
-			}
-//			for(String url : urls)
-				
-		}
-		else
-		{
-			System.out.println("真可惜，没找到您要搜索的关键词");
-		}
+		//To test
+//		invertedIndex.ReaderIndex();
+//		String key = "教育";
+//		HashMap<String,Double> urls = invertedIndex.DocScore(key);
+//		Date end  = new Date();
+//		if(urls != null)
+//		{
+//			System.out.println("得到了"+urls.size()+"个结果,耗时"+(end.getTime()-start.getTime())+"ms");
+//			for (Iterator iter = urls.entrySet().iterator(); iter.hasNext();) 
+//			{
+//				Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
+//				String url = (String) entry.getKey();
+//				double score =(Double)entry.getValue();
+//				System.out.println("结果网页:"+url+"\t词频得分: "+score);
+//			}
+//			System.out.println("#################################");
+//			System.out.println("排序");
+//			for(String url:invertedIndex.SortDoc(urls)){
+//				System.out.println("结果网页:"+url);
+//			}
+//				
+//		}
+//		else
+//		{
+//			System.out.println("真可惜，没找到您要搜索的关键词");
+//		}
 	}
 
 }

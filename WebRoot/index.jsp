@@ -33,7 +33,7 @@ String basePath = request.getScheme()+"://"
 	<p align="center"><img src="logo.jpg" /></p>
 	
 	
-	<form action="search.jsp" name="search" method="get" 
+	<form action="Search?model=0&CurrentNum=1" name="search" method="Post" 
 			enctype="application/x-www-form-urlencoded">
 	<table border="0" height="30px" width="450px" align="center">		
 		<tr>

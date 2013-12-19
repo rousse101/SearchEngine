@@ -23,7 +23,9 @@ public class MyServletContextListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent arg0) {
 		// TODO Auto-generated method stub
 		invertedIndex = new InvertedIndex();
-		invertedIndex.createInvertedIndex();
+		if(invertedIndex.ReaderIndex())
+			System.out.println("倒排索构建成功。");
+		System.out.println(invertedIndex.GetTotalDocNum());
 	}
 
 }

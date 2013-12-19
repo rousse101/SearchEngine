@@ -38,7 +38,7 @@ public class Gather implements Runnable {
 	public void run() {
 		
 		int counter = 0;
-		while(counter++ <= 10)		//每个线程提取100个网页
+		while(counter++ <= 50)		//每个线程提取100个网页
 		{
 			URL url = disp.getURL();
 			System.out.println(url);

@@ -3,12 +3,15 @@
  */
 package core.preprocess.invertedIndex;
 
+import java.io.Serializable;
+
 /**
  * @author Administrator
  *
  */
 //type中1表示出现在标题。0表示出现在body中。
-public class WordFiled {
+public class WordFiled implements Serializable{
+	
 	private String word;
 	private int type;
 	public WordFiled(String word,int type){

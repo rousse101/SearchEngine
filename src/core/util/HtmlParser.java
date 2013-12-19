@@ -2,7 +2,10 @@ package core.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +15,52 @@ public class HtmlParser {
 	public HtmlParser(){}
 	
 	//&quot;&nbsp;
+	//TODO 还有问题，有时候会返回null
+public Date parseNewsTime(String url, String htmlDoc) {
+		
+		int host = 0;
+		String patternString = null;
+		if (url.contains(".163.")) {
+			host = 1;
+			patternString = "(\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2})　来源: <a"; //"(\\d{4}-[01]\\d-[0-3]\\d\\s{1,2}[012]\\d:[0-6]\\d:[0-6]\\d)　来源: <a";
+		} else if (url.contains(".ifeng.")) {
+			host = 2;
+			patternString = "<span[\\s]+itemprop=\"datePublished\" class=\"ss01\">(\\d{4}年\\d{2}月\\d{2}日\\s?\\d{2}:\\d{2})</span>";
+		} else if (url.contains(".sina.")) {
+			host = 3;
+			patternString = "<span id=\"pub_date\">(\\d{4}年\\d{2}月\\d{2}日\\s?\\d{2}:\\d{2})</span>";
+		} else {
+			return null;
+		}
+		Pattern pattern = Pattern.compile(patternString,Pattern.CASE_INSENSITIVE);   
+		Matcher matcher = pattern.matcher(htmlDoc);
+		
+		if (matcher.find()) {
+			String time =  matcher.group(1);
+			SimpleDateFormat df = new SimpleDateFormat();
+			
+			switch (host) {
+			case 1:
+				df.applyPattern("yyyy-MM-dd HH:mm:ss");
+				break;
+			case 2:
+				df.applyPattern("yyyy年MM月dd日 HH:mm");
+				break;
+			case 3:
+				df.applyPattern("yyyy年MM月dd日HH:mm");
+			}
+			try {
+				return df.parse(time);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("cann't find the date time");
+		}
+		
+		return null;
+	}
+
 	public String htmlCode(String htmlDoc)
 	{
 		final String patternString = "<meta[^>]*charset=([^>]*\\s*>)";   		
@@ -46,6 +95,7 @@ public class HtmlParser {
 		}
 		return title;
 	}
+	
 	public String html2Text(String inputString) 
 	{    	
 		String htmlStr = inputString; //含html标签的字符串    

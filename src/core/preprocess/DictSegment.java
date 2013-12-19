@@ -52,16 +52,22 @@ public class DictSegment {
 			e.printStackTrace();
 		}
 		String htmlText = parser.html2Text(temp);
-		String titleSentance = parser.htmlTitle(temp).trim();
+		String titleSentance = parser.htmlTitle(temp);
 		System.out.println("title"+titleSentance);
 		//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
-		ArrayList<String> sentances = cutIntoSentance(htmlText);
 		ArrayList<WordFiled> segResult = new ArrayList<WordFiled>();
-		ArrayList<String> titles = cutIntoWord(titleSentance, true);
-		for(String s : titles){
-			WordFiled wf = new WordFiled(s,1);
-			segResult.add(wf);
+		
+		if(titleSentance!=null){
+			ArrayList<String> titles = cutIntoWord(titleSentance, true);
+			for(String s : titles){
+				WordFiled wf = new WordFiled(s,1);
+				segResult.add(wf);
+			}
 		}
+		
+		ArrayList<String> sentances = cutIntoSentance(htmlText);
+		
+		
 		for(int i = 0; i < sentances.size(); i++)
 		{
 			//TODO 这里先分段，在分词。分词被我删除掉。
