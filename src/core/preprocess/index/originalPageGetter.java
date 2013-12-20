@@ -113,7 +113,7 @@ public class originalPageGetter {
 			bfReader.skip(offset);
 			readRawHead(bfReader);
 			content = readRawContent(bfReader);
-			
+			bfReader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -146,8 +146,6 @@ public class originalPageGetter {
 				offset = Integer.parseInt(rs.getString("offset")); // 选择offset这列数据
 				raws = rs.getString("raws"); // 选择connent这列数据
 				
-				System.out.println(url + "\t" + connent + "\t" + offset + "\t" 
-						+ raws ); // 输出结果
 			}
 			
 			return new Page(url, offset, connent, raws);
@@ -202,7 +200,7 @@ public class originalPageGetter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		System.out.println("waht i read");
 		return strBuffer.toString();
 	}
 	

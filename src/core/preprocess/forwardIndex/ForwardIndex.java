@@ -15,7 +15,7 @@ import java.util.Map;
 
 import core.preprocess.DictSegment;
 import core.preprocess.index.originalPageGetter;
-import core.preprocess.invertedIndex.WordFiled;
+import core.preprocess.invertedIndex.DocPos;
 import core.util.DBConnection;
 
 /************************************************* 
@@ -37,18 +37,18 @@ ForwardIndex类建立网页正向索引，对应关系为url映射到网页所含词组,为倒排索引做准备
 public class ForwardIndex {
 
 	private DBConnection dbc = new DBConnection();
-	private HashMap<String, ArrayList<WordFiled>> indexMap = new HashMap<String, ArrayList<WordFiled>>();
+	private HashMap<String, HashMap<String,DocPos>> indexMap = new HashMap<String, HashMap<String,DocPos>>();
 	private originalPageGetter pageGetter = new originalPageGetter();
 	private DictSegment dictSeg = new DictSegment();
 	
 	public ForwardIndex()
 	{}
 	
-	public HashMap<String, ArrayList<WordFiled>> createForwardIndex()
+	public HashMap<String, HashMap<String,DocPos>> createForwardIndex()
 	{
 		int num=0;
 		try {
-			ArrayList<WordFiled> segResult = new ArrayList<WordFiled>();
+			HashMap<String,DocPos> segResult = new HashMap<String,DocPos>();
 			String sql = "select * from pageindex"; // 要执行的SQL语句
 			ResultSet rs = dbc.executeQuery(sql);
 			String url,fileName;
@@ -93,7 +93,7 @@ public class ForwardIndex {
 		return indexMap;
 	}
 	
-	public Boolean WriteForwardIndex(HashMap<String, ArrayList<WordFiled>> indexMap){
+	public Boolean WriteForwardIndex(HashMap<String, HashMap<String,DocPos>> indexMap){
 		try {
 			FileOutputStream outStream = new FileOutputStream("Index\\ForwardIndex.txt");
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream);
@@ -101,7 +101,7 @@ public class ForwardIndex {
 			for (Iterator iter = indexMap.entrySet().iterator(); iter.hasNext();) {
 				Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对
 			    String url = (String) entry.getKey();
-			    ArrayList<WordFiled> words = (ArrayList<WordFiled>) entry.getValue();
+			    HashMap<String,DocPos> words = (HashMap<String,DocPos>) entry.getValue();
 			    objectOutputStream.writeObject(url);
 			    objectOutputStream.writeObject(words);
 			    objectOutputStream.reset();
@@ -113,8 +113,8 @@ public class ForwardIndex {
 		}
 		return true;
 	}
-	public HashMap<String, ArrayList<WordFiled>>  ReaderForwardIndex(){
-		HashMap<String, ArrayList<WordFiled>> indexMap = new HashMap<String, ArrayList<WordFiled>>();
+	public HashMap<String,HashMap<String,DocPos>>  ReaderForwardIndex(){
+		HashMap<String, HashMap<String,DocPos>> indexMap = new HashMap<String,HashMap<String,DocPos>>();
 		try {
 			FileInputStream freader = new FileInputStream("Index\\ForwardIndex.txt");
 			ObjectInputStream objectInputStream = new ObjectInputStream(freader);
@@ -122,7 +122,7 @@ public class ForwardIndex {
 				int num = objectInputStream.readInt();
 				for(int n =0;n<num;n++){
 					String url = (String)objectInputStream.readObject();
-					ArrayList<WordFiled> wf = (ArrayList<WordFiled>)objectInputStream.readObject();
+					HashMap<String,DocPos> wf = (HashMap<String,DocPos>)objectInputStream.readObject();
 					indexMap.put(url, wf);
 				}
 				
@@ -139,22 +139,31 @@ public class ForwardIndex {
 	}
 	public static void main(String[] args) {
 		ForwardIndex forwardIndex = new ForwardIndex();
-		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.createForwardIndex();
+		
+		HashMap<String, HashMap<String,DocPos>> indexMap = forwardIndex.createForwardIndex();
 		if(forwardIndex.WriteForwardIndex(indexMap))
 			System.out.println("索引写入成功，请查看Index/ForwardIndex.txt！！");
 		else
 			System.out.println("索引写入失败！！");
 		
 //		TO TEST
-//		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.ReaderForwardIndex();
+//		HashMap<String,  HashMap<String ,DocPos>> indexMap = forwardIndex.ReaderForwardIndex();
 //		for (Iterator iter = indexMap.entrySet().iterator(); iter.hasNext();) {
 //			
 //			Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对
 //		    String url = (String) entry.getKey();
-//		    ArrayList<WordFiled> words = (ArrayList<WordFiled>) entry.getValue();
-//
-//		    System.out.println(url + " 对应的分词结果是： " + words.size());
+//		    HashMap<String ,DocPos> words = ( HashMap<String ,DocPos>) entry.getValue();
+//			for (Iterator it = words.entrySet().iterator(); it.hasNext();) {
+//				
+//				Map.Entry ent = (Map.Entry) it.next();    //map.entry 同时取出键值对
+//			    String word = (String) ent.getKey();
+//			    DocPos dp = (DocPos) ent.getValue();
+//			    System.out.println(url + " 对应的分词结果是： ");
+//			    System.out.print("\t分词是    "+word);
+//			    System.out.print("\t标题中次数   "+dp.getTitleTime());
+//			    System.out.println("\t正文中结果是： "+dp.getBodyTime());
 //		    }
+//		}
 	}
 
 }

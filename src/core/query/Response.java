@@ -25,7 +25,7 @@ public class Response {
 	public Response()
 	{
 		invertedIndex = new InvertedIndex();
-		//invertedIndex.createInvertedIndex();
+//		invertedIndex.ReaderIndex();
 		dictSeg = new DictSegment();
 		num =0;
 		resultGenerator = new ResultGenerator();
@@ -61,18 +61,15 @@ public class Response {
 		for(String keyWord : keyWords)
 			System.out.println(keyWord);
 		System.out.println("分词结果显示结束啦 \n");
-		System.out.println(invertedIndex.GetTotalDocNum());
-		HashMap<String,Double> resultUrl = new HashMap<String,Double>();
-		HashMap<String,Double> resultTemp = new HashMap<String,Double>();
 		
+		HashMap<String,Double> resultUrl = new HashMap<String,Double>();
 		for(String keyWord : keyWords){
 			//调用索引类计算文档得分，方法是idf*tf值
-			resultTemp = invertedIndex.DocScore(keyWord);			
+			HashMap<String,Double> resultTemp = invertedIndex.DocScore(keyWord);			
 			if(resultTemp != null){
 				resultUrl = mergeResultURL(resultUrl, resultTemp);
-			}	
+			}
 		}
-		
 		try{
 		
 			if(resultUrl.size() != 0){
@@ -86,11 +83,12 @@ public class Response {
 				for(int i =(N-1)*10 ;i <end; i ++){
 					String url = temp.get(i);
 					Result tempR = resultGenerator.generateResult(url);
-					if(tempR == null)
-						System.out.println(url + "对应的result为空！！！");
+					if(tempR == null){
+//						System.out.println(url + "对应的result为空！！！");
+					}
 					else
 					{
-						System.out.println(url + "对应的result不为空。。。。");
+//						System.out.println(url + "对应的result不为空。。。。");
 						results.add(tempR);	
 					}
 				}
@@ -106,10 +104,10 @@ public class Response {
 			HashMap<String,Double> resultTemp) {
 		//如果第一次执行，那么resultUrl还是空的，直接返回resultTemp就可以
 		if(resultUrl.size() == 0)
+		{
 			return resultTemp;
-		
+		}
 		//否则需要合并两者的公共部分,并且把文档得分相加
-		HashMap<String,Double> RESULT = new HashMap<String,Double>();
 		for (Iterator iter = resultTemp.entrySet().iterator(); iter.hasNext();) 
 		{
 			Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
@@ -119,10 +117,12 @@ public class Response {
 			if(resultUrl.containsKey(url))
 			{
 				double totalscore  = resultUrl.get(url)+score;
-				RESULT.put(url, totalscore);
+				resultUrl.put(url, totalscore);
+			}else{
+				resultUrl.put(url, score);
 			}
 		}
-		return RESULT;
+		return resultUrl;
 	}
 
 	/**
@@ -131,17 +131,18 @@ public class Response {
 	 */
 	public static void main(String[] args) {
 
-//		Response response = new Response();
-//		ArrayList<Result> results = response.getResponse("女人");
-//		
-//		System.out.println("返回结果如下：");
-//		for(Result result : results)
-//		{
-//			System.out.println(result.getTitle());
-//			System.out.println(result.getContent());
-//			System.out.println(result.getUrl() + "  " + result.getDate());
-//		}
+		Response response = new Response();
+		for(int i =0;i<10;i++){
+		ArrayList<Result> results = response.getResponse("中国",1);
 		
+		System.out.println("返回结果如下：");
+		for(Result result : results)
+		{
+			System.out.println(result.getTitle());
+			System.out.println(result.getContent());
+			System.out.println(result.getUrl() + "  " + result.getDate());
+		}
+		}
 	}
 
 }

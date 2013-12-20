@@ -43,7 +43,7 @@ InvertedIndex类建立网页倒排索引，对应关系为词组映射url，通过正向索引来建立
 
 public class InvertedIndex {
 
-	private HashMap<String, ArrayList<WordFiled>> fordwardIndexMap;
+	private HashMap<String, HashMap<String,DocPos>> fordwardIndexMap;
 //	private HashMap<String, ArrayList<String>> invertedIndexMap;
 	//添加了索引中的出现次数。利用hashmap存储文档和本文档中的次数。
 	private static HashMap<String, HashMap<String,DocPos>> invertedIndexMap;
@@ -102,60 +102,41 @@ public class InvertedIndex {
 		{
 			Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
 			String url = (String) entry.getKey();
-			ArrayList<WordFiled> words = (ArrayList<WordFiled>) entry.getValue();
+			HashMap<String,DocPos> words = (HashMap<String,DocPos>) entry.getValue();
 //			获取文档的词总算
 			
-			String word;
-			for(int i = 0; i < words.size(); i++)
+			for (Iterator it = words.entrySet().iterator(); it.hasNext();) 
 			{
-				WordFiled wf = words.get(i);
-				word = wf.getWord();
-				//倒排索引中还没有这个词，加入这个词，再把url链接上
+				Map.Entry en = (Map.Entry) it.next(); // map.entry 同时取出键值对
+				String word = (String) en.getKey();
+				DocPos dp  = (DocPos) en.getValue();
+				
 				if(!invertedIndexMap.containsKey(word))
 				{
 					HashMap<String,DocPos> urls = new HashMap<String,DocPos>();
-					DocPos dp;
-					if(wf.getType()==0){
-						dp = new DocPos(0,1);
-					}
-					else{
-						dp = new DocPos(1,0);
-					}
 					urls.put(url, dp);
 					invertedIndexMap.put(word, urls);
 				}
-				//索引中已经含有这个文档，就把这个词频+1
-//				如果索引里没有这个文档，需要找到这个key从而把url链接上
-				else
-				{
-					HashMap<String, DocPos> urls = invertedIndexMap.get(word);
-					if(!urls.containsKey(url)){
-						DocPos dp;
-						if(wf.getType()==0){
-							dp = new DocPos(0,1);
-						}
-						else{
-							dp = new DocPos(1,0);
-						}
+				else{
+					HashMap<String,DocPos> urls = invertedIndexMap.get(word);
+					if(urls.containsKey(url)){
+						DocPos dpin = urls.get(url);
+						int tn = dp.getTitleTime()+dpin.getTitleTime();
+						int bn = dp.getBodyTime()+dpin.getBodyTime();
+						dp.setBodyTime(bn);
+						dp.setTitleTime(tn);
 						urls.put(url, dp);
+						invertedIndexMap.put(word, urls);
+					}
+					else{
+						urls.put(url, dp);
+						invertedIndexMap.put(word, urls);
 					}
 						
-					else{
-						DocPos dp = urls.get(url);
-						if(wf.getType()==0){
-							int num = dp.getBodyTime()+1;
-							dp.setBodyTime(num);
-						}
-						else{
-							int num = dp.getTitleTime()+1;
-							dp.setTitleTime(num);
-						}
-						urls.put(url, dp);
-					}
 				}
+					
 			}
 		}
-
 		System.out.println("***************************************************************");
 		System.out.println("create invertedIndex finished!!");
 		System.out.println("the size of invertedIndex is : " + invertedIndexMap.size());
@@ -197,7 +178,6 @@ public class InvertedIndex {
 					tf_body = 1+Math.log10(dp.getBodyTime());
 				}
 				double tf = Wtitle*tf_title+Wbody*tf_body;
-				System.out.println(tf);
 				double score = idf *tf;
 				result.put(url, score);
 			}
@@ -242,12 +222,32 @@ public class InvertedIndex {
 	public static void main(String[] args) {
 		Date start = new Date();
 		InvertedIndex invertedIndex = new InvertedIndex();
+		
 		int N = invertedIndex.createInvertedIndex();
 		invertedIndex.WriteIndex(invertedIndexMap,N);
+		
+//		invertedIndex.ReaderIndex();
+//		for (Iterator iter = invertedIndexMap.entrySet().iterator(); iter.hasNext();) {
+//			
+//			Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对
+//		    String word = (String) entry.getKey();
+//		    HashMap<String ,DocPos> urls = ( HashMap<String ,DocPos>) entry.getValue();
+//			for (Iterator it = urls.entrySet().iterator(); it.hasNext();) {
+//				
+//				Map.Entry ent = (Map.Entry) it.next();    //map.entry 同时取出键值对
+//			    String url = (String) ent.getKey();
+//			    DocPos dp = (DocPos) ent.getValue();
+//			    System.out.println(word + " 对应的分词结果是： ");
+//			    System.out.println("\tURL是    "+url);
+//			    System.out.print("\t标题中次数   "+dp.getTitleTime());
+//			    System.out.println("\t正文中结果是： "+dp.getBodyTime());
+//		    }
+//		}
 		
 		//To test
 //		invertedIndex.ReaderIndex();
 //		String key = "教育";
+//		System.out.println("倒排索引大小"+invertedIndexMap.size());
 //		HashMap<String,Double> urls = invertedIndex.DocScore(key);
 //		Date end  = new Date();
 //		if(urls != null)

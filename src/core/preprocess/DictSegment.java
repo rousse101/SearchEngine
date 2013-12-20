@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 
@@ -13,7 +14,7 @@ import org.wltea.analyzer.core.Lexeme;
 
 import configure.Configuration;
 
-import core.preprocess.invertedIndex.WordFiled;
+import core.preprocess.invertedIndex.DocPos;
 import core.util.HtmlParser;
 
 //分词类,单例模式
@@ -42,7 +43,7 @@ public class DictSegment {
 	//流程，从htmlDoc中读取句子S，如果没有S了，算法结束
 	//如果还有，读取S，调用句子切词程序，切完继续读取S
 	//后续处理：剔除停用词，统计
-	public ArrayList<WordFiled> SegmentFile(String htmlDoc)
+	public HashMap<String,DocPos> SegmentFile(String htmlDoc)
 	{
 		//第一步操作，把html的文件用正则表达式处理，去掉标签等无用信息，保留文本进行操作
 		HtmlParser parser = new HtmlParser();
@@ -58,13 +59,21 @@ public class DictSegment {
 		String titleSentance = parser.htmlTitle(temp);
 		Date st3 = new Date();
 		//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
-		ArrayList<WordFiled> segResult = new ArrayList<WordFiled>();
+		HashMap<String,DocPos> segResult = new HashMap<String,DocPos>();
 		
 		if(titleSentance!=null){
 			ArrayList<String> titles = cutIntoWord(titleSentance, true);
 			for(String s : titles){
-				WordFiled wf = new WordFiled(s,1);
-				segResult.add(wf);
+				if(segResult.containsKey(s)){
+					DocPos wf =segResult.get(s);
+					int num = wf.getTitleTime()+1;
+					wf.setTitleTime(num);
+				}
+				else{
+					DocPos wf = new DocPos(1,0);
+					segResult.put(s, wf);
+				}
+				
 			}
 		}
 		Date st4 = new Date();
@@ -73,37 +82,20 @@ public class DictSegment {
 		
 		for(int i = 0; i < sentances.size(); i++)
 		{
-			//TODO 这里先分段，在分词。分词被我删除掉。
-//			考虑两点
 			ArrayList<String> words = cutIntoWord(sentances.get(i), true);
 			for(String s : words){
-				WordFiled wf = new WordFiled(s,0);
-				segResult.add(wf);
+				if(segResult.containsKey(s)){
+					DocPos wf =segResult.get(s);
+					int num = wf.getBodyTime()+1;
+					wf.setBodyTime(num);
+				}
+				else{
+					DocPos wf = new DocPos(0,1);
+					segResult.put(s, wf);
+				}
 			}
-			//segResult.addAll(cutIntoWord(sentances.get(i),true));
-//			segResult.add(sentances.get(i));
 		}
 		Date st6 = new Date();
-		if(segResult.size()<1&&sentances.size()>10){
-			System.out.println("编码"+parser.htmlCode(htmlDoc));
-			System.out.println("分词后页面:\n"+htmlText);
-//	    	for(String word: sentances){
-//	    		//		    			iso8859-1,(new String(word.getBytes("GBK"),"utf-8"))
-//				try {
-//					System.out.println("word:"+(new String(word.getBytes("GBK"),"UTF-8")));
-//				} catch (UnsupportedEncodingException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//	    	}
-//	    	try {
-//				Thread.sleep(10000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			
-	    }
 		long s1 = st2.getTime()-st1.getTime();
 		long s2 = st3.getTime()-st2.getTime();
 		long s3 = st4.getTime()-st3.getTime();
