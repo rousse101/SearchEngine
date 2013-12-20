@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,7 +28,6 @@ public class WebAnalyzer {
 		System.out.println("分析的文本大小: " + htmlDoc.length()/1024+"KB");
 		HtmlParser hp = new HtmlParser();
 		ArrayList<URL> urlInHtmlDoc = hp.urlDetector(htmlDoc,url);	
-		
 		saveDoc(bfWriter, url,htmlDoc);
 		return urlInHtmlDoc;
 	}
@@ -56,9 +56,9 @@ public class WebAnalyzer {
 			String versionStr = "version:1.0\n";
 			String URLStr = "url:" + url.toString() + "\n";
 			
-			Date date = new Date();     
-			String dateStr = "date:" + date.toString() + "\n";
-			
+			Date date = new Date();  
+			DateFormat df= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String dateStr = "date:" + df.format(date) + "\n";
 			InetAddress address = InetAddress.getByName(url.getHost()); 
 			String IPStr = address.toString();
 			IPStr = "IP:" + IPStr.substring(IPStr.indexOf("/")+1, IPStr.length()) + "\n";

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.StringTokenizer;
 
@@ -46,14 +47,16 @@ public class DictSegment {
 		//第一步操作，把html的文件用正则表达式处理，去掉标签等无用信息，保留文本进行操作
 		HtmlParser parser = new HtmlParser();
 		String temp=null;
+		Date st1 = new Date();
 		try {
 			temp = (new String(htmlDoc.getBytes("GBK"),parser.htmlCode(htmlDoc)));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+		Date st2 = new Date();
 		String htmlText = parser.html2Text(temp);
 		String titleSentance = parser.htmlTitle(temp);
-		System.out.println("title"+titleSentance);
+		Date st3 = new Date();
 		//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
 		ArrayList<WordFiled> segResult = new ArrayList<WordFiled>();
 		
@@ -64,9 +67,9 @@ public class DictSegment {
 				segResult.add(wf);
 			}
 		}
-		
+		Date st4 = new Date();
 		ArrayList<String> sentances = cutIntoSentance(htmlText);
-		
+		Date st5 = new Date();
 		
 		for(int i = 0; i < sentances.size(); i++)
 		{
@@ -80,6 +83,7 @@ public class DictSegment {
 			//segResult.addAll(cutIntoWord(sentances.get(i),true));
 //			segResult.add(sentances.get(i));
 		}
+		Date st6 = new Date();
 		if(segResult.size()<1&&sentances.size()>10){
 			System.out.println("编码"+parser.htmlCode(htmlDoc));
 			System.out.println("分词后页面:\n"+htmlText);
@@ -98,7 +102,20 @@ public class DictSegment {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
+			
 	    }
+		long s1 = st2.getTime()-st1.getTime();
+		long s2 = st3.getTime()-st2.getTime();
+		long s3 = st4.getTime()-st3.getTime();
+		long s4 = st5.getTime()-st4.getTime();
+		long s5 = st6.getTime()-st5.getTime();
+		long s6 = st6.getTime()-st1.getTime();
+		System.out.print("编码耗时:"+s1+"ms");
+		System.out.print("\t提取标题和正文耗时:"+s2+"ms");
+		System.out.print("\t分标题和加索引耗时:"+s3+"ms");
+		System.out.print("\t分词正文耗时:"+s4+"ms");
+		System.out.print("\t加索引耗时:"+s5+"ms");
+		System.out.println("\t总耗时:"+s6+"ms");
 		return segResult;
 	}
 	

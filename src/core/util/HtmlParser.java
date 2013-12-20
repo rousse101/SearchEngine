@@ -38,8 +38,8 @@ public Date parseNewsTime(String url, String htmlDoc) {
 		if (matcher.find()) {
 			String time =  matcher.group(1);
 			SimpleDateFormat df = new SimpleDateFormat();
-			
-			switch (host) {
+			df.applyPattern("yyyy-MM-dd HH:mm:ss");
+			/*switch (host) {
 			case 1:
 				df.applyPattern("yyyy-MM-dd HH:mm:ss");
 				break;
@@ -48,7 +48,8 @@ public Date parseNewsTime(String url, String htmlDoc) {
 				break;
 			case 3:
 				df.applyPattern("yyyyƒÍMM‘¬dd»’HH:mm");
-			}
+				
+			}*/
 			try {
 				return df.parse(time);
 			} catch (ParseException e) {

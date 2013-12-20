@@ -8,13 +8,17 @@ import java.util.ArrayList;
 public class Spider {
 
 	private ArrayList<URL> urls;
-	private int gatherNum = 5;
+	//启动线程数
+	private final int gatherNum ;
+	//每个线程抓取的页面
+	private final int ThreadPage;
 	
-	public Spider(){}
 	
-	public Spider(ArrayList<URL> urls)
+	public Spider(ArrayList<URL> urls,int ThreadNum,int ThreadPage)
 	{
 		this.urls = urls;
+		this.gatherNum = ThreadNum;
+		this.ThreadPage = ThreadPage;
 	}
 	
 	/**
@@ -24,7 +28,7 @@ public class Spider {
 		Dispatcher disp = new Dispatcher(urls);
 		for(int i = 0; i < gatherNum; i++)
 		{
-			Thread gather = new Thread(new Gather(String.valueOf(i), disp));
+			Thread gather = new Thread(new Gather(String.valueOf(i), disp, ThreadPage));
 			gather.start();
 		}
 	}
@@ -62,7 +66,7 @@ public class Spider {
 			e.printStackTrace();
 		}
 		
-		Spider spider = new Spider(urls);
+		Spider spider = new Spider(urls,5,10);
 		spider.start();
 
 	}

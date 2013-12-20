@@ -54,6 +54,7 @@ public class Response {
 		//1. 关键词分词、剔除停用词，并对分词结果进行查找对应的结果
 		//2. 合并各个分词的结果，返回初步的网页URL信息
 		results = new ArrayList<Result>();
+		System.out.println(request);
 		ArrayList<String> keyWords = dictSeg.cutIntoWord(request,true);
 		
 		System.out.println("查询关键字被分为");

@@ -57,13 +57,9 @@ public class InvertedIndex {
 			Configuration conf = new Configuration();
 			FileOutputStream outStream = new FileOutputStream(conf.getValue("INDEXPATH")+"\\Index\\Index.txt");
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream); 
+			objectOutputStream.writeInt(N);
 			objectOutputStream.writeObject(invertedIndexMap);
 			objectOutputStream.close();
-			FileOutputStream outN = new FileOutputStream(conf.getValue("INDEXPATH")+"\\Index\\conf.txt");
-			PrintStream p=new PrintStream(outN);
-			p.print(""+N);
-			p.close();
-			outStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -78,18 +74,12 @@ public class InvertedIndex {
 			FileInputStream freader = new FileInputStream(conf.getValue("INDEXPATH")+"\\Index\\Index.txt");
 			ObjectInputStream objectInputStream = new ObjectInputStream(freader);
 			try {
+				this.N= objectInputStream.readInt();
 				invertedIndexMap = (HashMap<String, HashMap<String,DocPos>>)objectInputStream.readObject();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				return false;
 			}
-			
-			FileReader fr = new FileReader(conf.getValue("INDEXPATH")+"\\Index\\conf.txt");
-			BufferedReader br = new BufferedReader(fr);
-			String s;
-			s = br.readLine();
-			System.out.println(s);
-			this.N= Integer.parseInt(s);
 			
 		}catch (IOException e) {
 			e.printStackTrace();

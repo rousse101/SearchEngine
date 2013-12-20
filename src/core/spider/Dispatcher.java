@@ -2,6 +2,7 @@ package core.spider;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import javax.swing.text.html.HTMLDocument.Iterator;
@@ -9,11 +10,12 @@ import javax.swing.text.html.HTMLDocument.Iterator;
 public class Dispatcher {
 
 	private static ArrayList<URL> urls = new ArrayList<URL>();
-	private static ArrayList<URL> visitedURLs = new ArrayList<URL>();
-	private static ArrayList<URL> unvisitedURLs = new ArrayList<URL>();
-	
+	private static HashMap<URL,Integer> map = new HashMap<URL,Integer>();
 	public Dispatcher(ArrayList<URL> urls) {    
 		this.urls = urls; 
+		for(URL url: urls){
+			map.put(url, 0);
+		}
 	}    
 	public boolean outofSize(){
 		if(urls.size()>5000){
@@ -34,7 +36,6 @@ public class Dispatcher {
 		
 		this.notify(); 
 		URL url = urls.get(0);
-		visitedURLs.add(url);
 		urls.remove(url);
 		
 	    return url; 
@@ -42,8 +43,11 @@ public class Dispatcher {
 
 	public synchronized void insert(URL url)
 	{
-		if(!urls.contains(url) && !visitedURLs.contains(url))
+		if(!map.containsKey(url))
+		{
 			urls.add(url);
+			map.put(url, 0);
+		}
 	}
 
 	public synchronized void insert(ArrayList<URL> analyzedURL)
@@ -51,7 +55,11 @@ public class Dispatcher {
 		for(URL url : analyzedURL)
 		{
 			//if(!urls.contains(url) && !visitedURLs.contains(url))
-			urls.add(url);
+			if(!map.containsKey(url))
+			{
+				urls.add(url);
+				map.put(url, 0);
+			}
 		}
 		System.out.println("url¥Û–°"+urls.size());
 	}

@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -57,25 +58,22 @@ public class ForwardIndex {
 			System.out.println("in the process of creating forwardIndex: ");
 			while (rs.next()) {				
 				url = rs.getString("url"); // 选择sname这列数据
-//				System.out.println(url);
-				
-				if(url.equals("http://www.sogou.com/")){
-					System.out.println();
-				}
-				
+				Date start = new Date();
 				fileName = rs.getString("raws");
 				offset = Integer.parseInt(rs.getString("offset"));
 				String htmlDoc = pageGetter.getContent(fileName, offset);
+				Date doc = new Date();
 				segResult = dictSeg.SegmentFile(htmlDoc);
+				Date seg = new Date();
 				indexMap.put(url, segResult);
-//				while(end==last)
-//				{
-//						System.out.println("url\t"+url);
-//						System.out.println("segResult size\t"+segResult.size());
-//						Thread.sleep(10000);
-//					};
+				Date ind = new Date();
+				long doctime = doc.getTime()-start.getTime();
+				long segtime = seg.getTime()-doc.getTime();
+				long indextime = ind.getTime()-seg.getTime();
+				System.out.print("读Html耗时:"+doctime+"ms");
+				System.out.print("\t分词耗时:"+segtime+"ms");
+				System.out.println("\t加索引耗时:"+indextime+"ms");
 				num++;
-//				System.out.println("词大小: " + segResult.size());
 			}
 
 			rs.close();
@@ -98,8 +96,17 @@ public class ForwardIndex {
 	public Boolean WriteForwardIndex(HashMap<String, ArrayList<WordFiled>> indexMap){
 		try {
 			FileOutputStream outStream = new FileOutputStream("Index\\ForwardIndex.txt");
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream); 
-			objectOutputStream.writeObject(indexMap);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream);
+			objectOutputStream.writeInt(indexMap.size());
+			for (Iterator iter = indexMap.entrySet().iterator(); iter.hasNext();) {
+				Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对
+			    String url = (String) entry.getKey();
+			    ArrayList<WordFiled> words = (ArrayList<WordFiled>) entry.getValue();
+			    objectOutputStream.writeObject(url);
+			    objectOutputStream.writeObject(words);
+			    objectOutputStream.reset();
+			}
+//			
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -112,7 +119,13 @@ public class ForwardIndex {
 			FileInputStream freader = new FileInputStream("Index\\ForwardIndex.txt");
 			ObjectInputStream objectInputStream = new ObjectInputStream(freader);
 			try {
-				indexMap = (HashMap<String, ArrayList<WordFiled>>)objectInputStream.readObject();
+				int num = objectInputStream.readInt();
+				for(int n =0;n<num;n++){
+					String url = (String)objectInputStream.readObject();
+					ArrayList<WordFiled> wf = (ArrayList<WordFiled>)objectInputStream.readObject();
+					indexMap.put(url, wf);
+				}
+				
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				return null;
@@ -126,21 +139,22 @@ public class ForwardIndex {
 	}
 	public static void main(String[] args) {
 		ForwardIndex forwardIndex = new ForwardIndex();
-//		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.createForwardIndex();
-//		if(forwardIndex.WriteForwardIndex(indexMap))
-//			System.out.println("索引写入成功，请查看Index/ForwardIndex.txt！！");
-//		else
-//			System.out.println("索引写入失败！！");
-		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.ReaderForwardIndex();
-//		int num=0;
-		for (Iterator iter = indexMap.entrySet().iterator(); iter.hasNext();) {
-			
-			Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对
-		    String url = (String) entry.getKey();
-		    ArrayList<WordFiled> words = (ArrayList<WordFiled>) entry.getValue();
-
-		    System.out.println(url + " 对应的分词结果是： " + words.size());
-		    }
+		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.createForwardIndex();
+		if(forwardIndex.WriteForwardIndex(indexMap))
+			System.out.println("索引写入成功，请查看Index/ForwardIndex.txt！！");
+		else
+			System.out.println("索引写入失败！！");
+		
+//		TO TEST
+//		HashMap<String, ArrayList<WordFiled>> indexMap = forwardIndex.ReaderForwardIndex();
+//		for (Iterator iter = indexMap.entrySet().iterator(); iter.hasNext();) {
+//			
+//			Map.Entry entry = (Map.Entry) iter.next();    //map.entry 同时取出键值对
+//		    String url = (String) entry.getKey();
+//		    ArrayList<WordFiled> words = (ArrayList<WordFiled>) entry.getValue();
+//
+//		    System.out.println(url + " 对应的分词结果是： " + words.size());
+//		    }
 	}
 
 }
