@@ -74,8 +74,8 @@ public class originalPageGetter {
 			String word;
 			bfReader.skip(page.getOffset());
 			
-			readRawHead(bfReader);
-			content = readRawContent(bfReader);
+			int sr = readRawOffset(bfReader);
+			content = readRawContent(bfReader,sr);
 			String contentMD5 = md5.getMD5ofStr(content);
 			
 			if(contentMD5.equals(page.getConnent()))
@@ -111,8 +111,8 @@ public class originalPageGetter {
 
 			String word;
 			bfReader.skip(offset);
-			readRawHead(bfReader);
-			content = readRawContent(bfReader);
+			int ro = readRawOffset(bfReader);
+			content = readRawContent(bfReader,ro);
 			bfReader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -155,7 +155,25 @@ public class originalPageGetter {
 		
 		return null;
 	}
-	
+	private int readRawOffset(BufferedReader bfReader)
+	{		
+		int offset=0;
+		try{
+		//String urlLine = null;
+			bfReader.readLine();    //version
+			bfReader.readLine();    //url
+			bfReader.readLine();	//date
+			bfReader.readLine();    //ip
+			String s= bfReader.readLine();
+			s = s.substring(s.indexOf(":")+1, s.length());
+			offset = Integer.parseInt(s);
+			bfReader.readLine();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		return offset;
+	}
 	private String readRawHead(BufferedReader bfReader)
 	{		
 		//String urlLine = null;
@@ -185,9 +203,9 @@ public class originalPageGetter {
 		return headStr;
 	}
 	
-	private String readRawContent(BufferedReader bfReader)
+	private String readRawContent(BufferedReader bfReader,int rawoffset)
 	{
-		StringBuffer strBuffer = new StringBuffer();		
+		StringBuffer strBuffer = new StringBuffer(rawoffset);		
 		try {		
 			String word;
 			while((word = bfReader.readLine()) != null)
@@ -200,7 +218,6 @@ public class originalPageGetter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("waht i read");
 		return strBuffer.toString();
 	}
 	

@@ -80,11 +80,13 @@ public class InvertedIndex {
 				e.printStackTrace();
 				return false;
 			}
-			
+			freader.close();
+			objectInputStream.close();
 		}catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
+		conf = null;
 		if(invertedIndexMap.size()>0)
 		return true;
 		else 
