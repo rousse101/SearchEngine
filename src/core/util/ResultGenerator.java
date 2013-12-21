@@ -50,17 +50,6 @@ public class ResultGenerator {
 			{
 				shortContent = m_meta.group();   
 				shortContent = shortContent.toLowerCase();
-				
-				if(shortContent.contains("description"))
-				{
-					int start = shortContent.indexOf("content=")+9;
-				
-					shortContent = (String) shortContent.
-						subSequence(start, shortContent.length());
-					int end = shortContent.indexOf("\"");
-					shortContent =  (String) shortContent.subSequence(0, end);
-					break;
-				}			
 			}
 		}
 		
