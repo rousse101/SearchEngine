@@ -9,7 +9,7 @@ public class Page {
 	private String rawName;
 	private String rawtime;
 	
-	
+	private int totalCount;
 	public Page()
 	{
 		
@@ -48,19 +48,20 @@ public class Page {
 		this.connent = connent;
 		this.rawName = rawName;
 	}
-	public void setPage(String url, int offset, String connent, String rawName,String rawtime)
+	public void setPage(String url, int offset, String connent, String rawName,String rawtime,int totalCount)
 	{
 		this.url = url;
 		this.offset = offset;
 		this.connent = connent;
 		this.rawName = rawName;
 		this.rawtime = rawtime;
+		this.totalCount = totalCount;
 	}
 
 	public void add2DB(DBConnection dbc) {
 		if(rawtime !=null){
-		String sql = "insert into pageindex(url, connent, offset, raws,pagetime)" +
-			" values ('"+url+"', '"+connent+"', '"+offset+"', '"+rawName+"', '"+rawtime+"')";
+		String sql = "insert into pageindex(url, connent, offset, raws,pagetime,count)" +
+			" values ('"+url+"', '"+connent+"', '"+offset+"', '"+rawName+"', '"+rawtime+"', '"+totalCount+"')";
 		dbc.executeUpdate(sql);
 		}
 		else

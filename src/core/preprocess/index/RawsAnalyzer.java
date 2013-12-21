@@ -46,6 +46,7 @@ public class RawsAnalyzer {
 	private String contentMD5;
 	private String Rawurl;
 	private String Rawtime;
+	private int totalCount;
 	
 	public RawsAnalyzer(String rootName)
 	{
@@ -70,6 +71,9 @@ public class RawsAnalyzer {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
+		
+		totalCount = parser.GetCount(temp);
+		
 		String htmlText = parser.html2Text(temp);
 		contentMD5 = md5.getMD5ofStr(htmlText);
 		String titleSentance = parser.htmlTitle(temp);
@@ -125,7 +129,7 @@ public class RawsAnalyzer {
 			int oldOffset = 0;
 			
 			//bfReader已经把version:1.0读入了
-			while((word = bfReader.readLine()) != null)
+			while((word = bfReader.readLine())  != null)
 			{
 				oldOffset = offset;
 				readRawHead(bfReader);
@@ -136,7 +140,7 @@ public class RawsAnalyzer {
 //				System.out.println("the offset in " + fileName +" is: " + offset);
 //				System.out.println("the url is " + url);
 				
-				page.setPage(Rawurl, oldOffset, contentMD5, myfile,Rawtime);
+				page.setPage(Rawurl, oldOffset, contentMD5, myfile,Rawtime,totalCount);
 				page.add2DB(dbc);
 			}	
 			bfWriter.close();

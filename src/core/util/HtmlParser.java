@@ -16,6 +16,20 @@ public class HtmlParser {
 	
 	//&quot;&nbsp;
 	//TODO 还有问题，有时候会返回null
+public int GetCount(String htmlDoc){
+	
+	Pattern pattern=Pattern.
+	compile("totalCount\\s+=\\s+([0-9]+),");
+	Matcher matcher=pattern.matcher(htmlDoc);
+	if(matcher.find()){
+		String temp=matcher.group(1);
+		return Integer.parseInt(temp);
+	}
+	else
+	{
+		return 0;	
+	}
+}
 public Date parseNewsTime(String url, String htmlDoc) {
 		
 		int host = 0;

@@ -1,18 +1,19 @@
 package core.webServlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import core.preprocess.invertedIndex.InvertedIndex;
-import core.query.Response;
 import core.util.Result;
+import core.util.ResultGenerator;
 
-public class SearchServlet extends HttpServlet {
+public class getPreviewContent extends HttpServlet {
 
 	/**
 	 * Destruction of the servlet. <br>
@@ -34,7 +35,8 @@ public class SearchServlet extends HttpServlet {
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		doPost(request,response);
+
+		doPost(request, response);
 	}
 
 	/**
@@ -47,28 +49,20 @@ public class SearchServlet extends HttpServlet {
 	 * @throws ServletException if an error occurred
 	 * @throws IOException if an error occurred
 	 */
+	
+	
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Response rp = new Response();
-		String keyword = new String(request.getParameter("keyword").getBytes("ISO-8859-1"),"GB2312"); 
-		String model = new String(request.getParameter("model").getBytes("ISO-8859-1"),"GB2312"); 
-		String curnum = new String(request.getParameter("CurrentNum").getBytes("ISO-8859-1"),"GB2312"); 
-		int md =Integer.parseInt(model);
-		int cn = Integer.parseInt(curnum);
-		ArrayList<Result> results = rp.getResponse(keyword,cn,md);
-		int tn = rp.getResultSize();
-		request.getSession().setAttribute("maywords", null);
-		if(tn<5){
-			ArrayList<String> maywords = rp.getMayWord(keyword);
-			request.getSession().setAttribute("maywords", maywords);
-		}
-		request.getSession().setAttribute("results", results);
-		request.getSession().setAttribute("keyword", keyword);
-		request.getSession().setAttribute("curnum", cn);
-		request.getSession().setAttribute("pagenum", tn/10+1);
-		
-		response.sendRedirect("search.jsp");
-		
+
+		response.setContentType("text/html");
+		response.setCharacterEncoding("UTF-8");
+		String url = new String(request.getParameter("url").getBytes("ISO-8859-1"),"GB2312"); 
+		ResultGenerator resultGenerator = new ResultGenerator();
+		String content = resultGenerator .generateResult(url);
+		PrintWriter out = response.getWriter();
+		out.write(content);
+		out.flush();
+		out.close();
 	}
 
 	/**
@@ -78,7 +72,6 @@ public class SearchServlet extends HttpServlet {
 	 */
 	public void init() throws ServletException {
 		// Put your code here
-		
 	}
 
 }

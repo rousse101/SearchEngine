@@ -190,7 +190,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 </script>
 
 	<a href ="Search?keyword=<%=keyword%>&model=1&CurrentNum=1">按时间排序</a>
-	
+	<a href ="Search?keyword=<%=keyword%>&model=2&CurrentNum=1">按热度排序</a>
 	<div align="center">
     
 	<img src="logo.gif" />
@@ -206,6 +206,16 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	    <select id="tags" onkeyup="text();" onclick="myclick();" size="0" style=" margin:-2px;">
 	 	</select>
 	 </div>
+	<%  
+	 ArrayList<String>  mayword=(ArrayList<String>)session.getAttribute("maywords"); 
+	 if(mayword!=null&&mayword.size()!=0){	
+	 	out.print("<p>你要找的是不是：");
+	 	for(String s :mayword){
+	 	out.print("\t<a href=\"Search?keyword="+s+"&model=0&CurrentNum=1\">"+s+"</a>");
+	 	}
+	 	out.print("</p>");
+	 }
+	 %>	
 	
 	<%  
 		for(Result result : results)

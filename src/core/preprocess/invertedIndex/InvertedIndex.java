@@ -71,6 +71,35 @@ public class InvertedIndex {
 		}
 		return term;
 	}
+	public ArrayList<String> getMayWord(ArrayList<String> keytag){
+		if(keytag.size()==1){
+			String m = keytag.get(0);
+			keytag.remove(0);
+			for(int i=0;i<m.length();i++){
+			keytag.add(m.substring(i,i+1));
+			}	
+		}
+		ArrayList<String> term = new ArrayList<String>(keytag.size());
+		for(String s : keytag){
+			int max=5;
+			String myword=null;
+			for (Iterator iter = invertedIndexMap.entrySet().iterator(); iter.hasNext();) 
+			{
+				Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
+				String word = (String) entry.getKey();
+				int num = ((HashMap<String,DocPos>) entry.getValue()).size();
+				if(word.contains(s)&&num>max&&word.length()>1){
+					if(num>max){
+						max = num;
+						myword = word;
+					}
+				}
+			}
+			term.add(myword);
+		}
+		return term;
+	}
+	
 	public Boolean WriteIndex(HashMap<String, HashMap<String,DocPos>> invertedIndexMap,int N){
 		try {
 			Configuration conf = new Configuration();
@@ -231,13 +260,14 @@ public class InvertedIndex {
 			}
 		}
 	}
+	//排序value是double的hashmap
 	public ArrayList<String> SortDoc(HashMap<String,Double> urls){
 		ArrayList<String> result = new ArrayList<String>(urls.keySet());
 		ByValueComparator bvc = new ByValueComparator(urls);
 		Collections.sort(result,bvc);
 		return result;
 	}
-	
+	//这个内部类是实现排序value值是date的hasmap
 	class ByTimeComparator implements Comparator<String> {
 		HashMap<String, Date> here;
 		public ByTimeComparator(HashMap<String, Date> urls){
@@ -253,7 +283,7 @@ public class InvertedIndex {
 			}
 		}
 	}
-	
+	//sortBytime内部使用的调用方法。会使用bYtimecompare排序类。
 	private ArrayList <String> SortTime(HashMap<String,Date> urls){
 		ArrayList<String> result = new ArrayList<String>(urls.keySet());
 		ByTimeComparator bvc = new ByTimeComparator(urls);
@@ -261,6 +291,7 @@ public class InvertedIndex {
 		System.out.println("over sort time");
 		return result;
 	}
+	//按时间排序url
 	public ArrayList<String> SortBytime(ArrayList<String> urls){
 		HashMap<String,Date> sortmap = new HashMap<String,Date>(urls.size());
 		DBConnection dbc = new DBConnection();
@@ -285,8 +316,33 @@ public class InvertedIndex {
 			}
 		}
 		dbc.close();
+		
 		return SortTime(sortmap);
 	}
+	
+	//按热度排序url
+	public ArrayList<String> SortByHot(ArrayList<String> urls){
+		HashMap<String,Double> sortmap = new HashMap<String,Double>(urls.size());
+		DBConnection dbc = new DBConnection();
+		DateFormat df= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		for(String url :urls){
+			String sql = "select * from pageindex where url ='"+url+"'";
+			ResultSet rs = dbc.executeQuery(sql);
+			try{
+				if(rs.next())
+					{
+						int count = rs.getInt("count"); // 选择sname这列数据
+						sortmap.put(url, count/1.0);
+					}
+			rs.close();
+			}catch(SQLException s){
+				s.printStackTrace();
+			}
+		}
+		dbc.close();
+		return SortDoc(sortmap);
+	}
+	
 	
 	/**
 	 * @param args

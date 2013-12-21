@@ -24,36 +24,42 @@ public class testParseHtml {
 	 */
 	public static void main(String[] args) {
 
-		String testFile = "test\\test.txt";
-		HtmlParser parser = new HtmlParser();
-		originalPageGetter pageGetter = new originalPageGetter();
-		DictSegment dictSeg = new DictSegment();
-		String htmlDoc = pageGetter.getContent(testFile, 0);
-		ArrayList<String> segResult = new ArrayList<String>();
+		String testFile = "骨头夹";
+		for(int i=0;i<testFile.length();i++)
+		{
+		System.out.println(testFile.substring(i,i+1));	
+		}
+//		HtmlParser parser = new HtmlParser();
+//		System.out.println(parser.GetCount(testFile));
 		
-		//文档处理阶段
-		String temp=null;
-			try {
-				temp = (new String(htmlDoc.getBytes("GBK"),parser.htmlCode(htmlDoc)));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		String title = parser.htmlTitle(htmlDoc);
-		String htmlText = parser.html2Text(temp);
+//		originalPageGetter pageGetter = new originalPageGetter();
+//		DictSegment dictSeg = new DictSegment();
+//		String htmlDoc = pageGetter.getContent(testFile, 0);
+//		ArrayList<String> segResult = new ArrayList<String>();
 		
-		System.out.println("title:"+title);
-			//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
-			ArrayList<String> sentances = dictSeg.cutIntoSentance(htmlText);
-			segResult = new ArrayList<String>();
-			for(int i = 0; i < sentances.size(); i++)
-			{
-				//TODO 这里先分段，在分词。分词被我删除掉。
-//				考虑两点
-				ArrayList<String> words = dictSeg.cutIntoWord(sentances.get(i),true);
-				for(String word:words){
-					System.out.println(word);
-				}
-//				segResult.add(sentances.get(i));
-			}	
+//		//文档处理阶段
+//		String temp=null;
+//			try {
+//				temp = (new String(htmlDoc.getBytes("GBK"),parser.htmlCode(htmlDoc)));
+//			} catch (UnsupportedEncodingException e) {
+//				e.printStackTrace();
+//			}
+//		String title = parser.htmlTitle(htmlDoc);
+//		String htmlText = parser.html2Text(temp);
+//		
+//		System.out.println("title:"+title);
+//			//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
+//			ArrayList<String> sentances = dictSeg.cutIntoSentance(htmlText);
+//			segResult = new ArrayList<String>();
+//			for(int i = 0; i < sentances.size(); i++)
+//			{
+//				//TODO 这里先分段，在分词。分词被我删除掉。
+////				考虑两点
+//				ArrayList<String> words = dictSeg.cutIntoWord(sentances.get(i),true);
+//				for(String word:words){
+//					System.out.println(word);
+//				}
+////				segResult.add(sentances.get(i));
+//			}	
 	}	
 }

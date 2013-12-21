@@ -38,6 +38,11 @@ public class Response {
 		doQuery(request,n,model);
 		return results;
 	}
+	public ArrayList<String> getMayWord(String keyword){
+		ArrayList<String> keyWords = dictSeg.cutIntoWord(keyword,true);
+		
+		return invertedIndex.getMayWord(keyWords);
+	}
 	
 	//查询过程：
 	//1. 关键词分词、剔除停用词，并对分词结果进行查找对应的结果
@@ -79,6 +84,7 @@ public class Response {
 				//TODO 后续可以考虑控制返回文档的量级。
 				ArrayList<String>temp = invertedIndex.SortDoc(resultUrl);
 				if(model==1)temp = invertedIndex.SortBytime(temp);
+				else if(model==2)temp = invertedIndex.SortByHot(temp);
 				this.num = temp.size();
 				int end = N*10 >temp.size() ? temp.size() : N*10;
 				for(int i =(N-1)*10 ;i <end; i ++){
