@@ -1,13 +1,21 @@
 package core.preprocess.index;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import core.util.DBConnection;
+import core.util.HtmlParser;
 import core.util.MD5;
 import core.util.Page;
 
@@ -31,9 +39,13 @@ public class RawsAnalyzer {
 
 	private DBConnection dbc = new DBConnection();
 	private MD5 md5 = new MD5();
-	private int offset;
+//	private int offset;
 	private Page page;
 	private String rootDirectory;
+	
+	private String contentMD5;
+	private String Rawurl;
+	private String Rawtime;
 	
 	public RawsAnalyzer(String rootName)
 	{
@@ -47,6 +59,48 @@ public class RawsAnalyzer {
 		for(String fileName : fileNames)
 			createPageIndex(fileName);	
 	}
+	//TODO
+	public int createRawIndex(BufferedWriter bfWriter,String htmlDoc){
+		
+		
+		HtmlParser parser = new HtmlParser();
+		String temp = null;
+		try {
+			temp = (new String(htmlDoc.getBytes("GBK"),parser.htmlCode(htmlDoc)));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String htmlText = parser.html2Text(temp);
+		contentMD5 = md5.getMD5ofStr(htmlText);
+		String titleSentance = parser.htmlTitle(temp);
+		
+		
+		String URLStr = "url:" + Rawurl + "\n";
+		String dateStr = "date:" + Rawtime + "\n";
+		String titleStr = "tittle:" + titleSentance + "\n";
+		String textlen = "length:" + htmlText.length() + "\n";
+		System.out.println("the url is " + URLStr);
+		
+		System.out.println(contentMD5);
+		try{
+		//数据头部分
+		bfWriter.append(URLStr);
+		bfWriter.append(dateStr);
+		bfWriter.append(titleStr);
+		bfWriter.append(textlen);
+		bfWriter.newLine();
+		
+		//数据部分
+		bfWriter.append(htmlText);
+		bfWriter.newLine();
+		
+		bfWriter.flush();	
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 1;
+	}
 	
 	public void createPageIndex(String fileName)
 	{
@@ -54,33 +108,38 @@ public class RawsAnalyzer {
 		{
 			FileReader fileReader = new FileReader(fileName);
 			BufferedReader bfReader = new BufferedReader(fileReader);
-
+			String myfile = "Text"+fileName.substring(fileName.indexOf("_"),fileName.length());
+			String RawText = "Index\\"+myfile;
+			System.out.println(RawText);
+			File file = new File(RawText);           //设定输出的文件名
+			BufferedWriter bfWriter= null;
+			try {
+				file.createNewFile();
+				bfWriter = new BufferedWriter(new FileWriter(file));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 			String word;
-			offset = 0;
+			int offset = 0;
 			int oldOffset = 0;
 			
 			//bfReader已经把version:1.0读入了
 			while((word = bfReader.readLine()) != null)
 			{
 				oldOffset = offset;
-				offset += word.length() + 1;
-				String url = readRawHead(bfReader);
+				readRawHead(bfReader);
 				String content = readRawContent(bfReader);
 				
-				System.out.println("the offset in " + fileName +" is: " + offset);
-				System.out.println("the url is " + url);
-//				System.out.println("the content is " + content);
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-				String contentMD5 = md5.getMD5ofStr(content);
-				page.setPage(url, oldOffset, contentMD5, fileName);
+				offset += createRawIndex( bfWriter,content);
+				
+//				System.out.println("the offset in " + fileName +" is: " + offset);
+//				System.out.println("the url is " + url);
+				
+				page.setPage(Rawurl, oldOffset, contentMD5, myfile);
 				page.add2DB(dbc);
 			}	
-			
+			bfWriter.close();
 			bfReader.close();
 			//dbc.close();
 			
@@ -98,16 +157,17 @@ public class RawsAnalyzer {
 		try {
 			
 			urlLine = bfReader.readLine();	
-			offset = offset + urlLine.length() + 1;
 			if(urlLine != null)
-				urlLine = urlLine.substring(urlLine.indexOf(":")+1, urlLine.length());
+				Rawurl = urlLine.substring(urlLine.indexOf(":")+1, urlLine.length());
 			
+			String date = bfReader.readLine();	
+			if(date != null)
+				Rawtime = date.substring(date.indexOf(":")+1, date.length());
 			String temp;
 			while(!(temp = bfReader.readLine()).trim().isEmpty())
 			{
-				offset = offset + temp.length() + 1;
+				;
 			}		
-			offset += 1;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -123,13 +183,11 @@ public class RawsAnalyzer {
 			String word;
 			while((word = bfReader.readLine()) != null)
 			{
-				offset = offset + word.length() + 1;
 				if(word.trim().isEmpty())
 					break;
 				else
 					strBuffer.append(word + "\n");
 			}
-			offset += 2;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -163,7 +221,9 @@ public class RawsAnalyzer {
 	}
 	
 	public static void main(String[] args) {
-
+		DBConnection dbc = new DBConnection();
+		String sql ="delete from pageindex";
+		dbc.executeUpdate(sql);
 		RawsAnalyzer analyzer = new RawsAnalyzer("Raws");
 		analyzer.createPageIndex();
 

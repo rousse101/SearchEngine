@@ -82,7 +82,7 @@ public class Response {
 				int end = N*10 >temp.size() ? temp.size() : N*10;
 				for(int i =(N-1)*10 ;i <end; i ++){
 					String url = temp.get(i);
-					Result tempR = resultGenerator.generateResult(url);
+					Result tempR = resultGenerator.generateResult(url,keyWords);
 					if(tempR == null){
 //						System.out.println(url + "对应的result为空！！！");
 					}

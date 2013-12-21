@@ -62,17 +62,18 @@ public class ForwardIndex {
 				fileName = rs.getString("raws");
 				offset = Integer.parseInt(rs.getString("offset"));
 				String htmlDoc = pageGetter.getContent(fileName, offset);
+				String title  = pageGetter.getTitleFromHead();
 				Date doc = new Date();
-				segResult = dictSeg.SegmentFile(htmlDoc);
+				segResult = dictSeg.SegmentFile(htmlDoc,title);
 				Date seg = new Date();
 				indexMap.put(url, segResult);
 				Date ind = new Date();
 				long doctime = doc.getTime()-start.getTime();
 				long segtime = seg.getTime()-doc.getTime();
 				long indextime = ind.getTime()-seg.getTime();
-				System.out.print("读Html耗时:"+doctime+"ms");
-				System.out.print("\t分词耗时:"+segtime+"ms");
-				System.out.println("\t加索引耗时:"+indextime+"ms");
+//				System.out.print("读Html耗时:"+doctime+"ms");
+//				System.out.print("\t分词耗时:"+segtime+"ms");
+//				System.out.println("\t加索引耗时:"+indextime+"ms");
 				num++;
 			}
 

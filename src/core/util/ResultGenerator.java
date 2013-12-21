@@ -1,5 +1,6 @@
 package core.util;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,8 +11,7 @@ public class ResultGenerator {
 	
 	private originalPageGetter pageGetter;
 	private HtmlParser parser;
-	Pattern p_title, p_meta;    
-	Matcher m_title, m_meta;
+	
 	
 	public ResultGenerator()
 	{
@@ -19,13 +19,10 @@ public class ResultGenerator {
 		parser = new HtmlParser();
 		
 		//用于后续匹配title的正则表达式
-		String regEx_title = "<title[^>]*?>[\\s\\S]*?</title>"; 
-		String regEx_meta = "<meta[\\s\\S]*?>";    
-		p_title = Pattern.compile(regEx_title,Pattern.CASE_INSENSITIVE);
-		p_meta = Pattern.compile(regEx_meta,Pattern.CASE_INSENSITIVE);
+		
 	}
 
-	public Result generateResult(String url) {
+	public Result generateResult(String url,ArrayList<String> keyWords) {
 		
 		Page page;
 		String content ="";		
@@ -38,74 +35,63 @@ public class ResultGenerator {
 		//content = page.getConnent();
 		//由于在之前的getContent中，调用readRawHead，之后再readRawHead
 		//所以date的产生式对应着的，因为date在readRawHead生产
-		date = pageGetter.getDate();
+		date = pageGetter.getDateFromHead();
 		
-		//contentText = parser.html2Text(content);
-		
-		//开始生产title，title是从html的标签中的title中产生的:<title>Google</title>		
-		m_title = p_title.matcher(content);    
-		while(m_title.find())
-		{
-			title = m_title.group();   
-			//取其中第1个'>'和第二个'<'之间的文字
-			title = title.substring(title.indexOf(">")+1, title.lastIndexOf("<"));
-			break;
-		}
+		title = pageGetter.getTitleFromHead();
 		
 		//开始产生内容提示
-		m_meta = p_meta.matcher(content);    
-		while(m_meta.find())
-		{
-			shortContent = m_meta.group();   
-			shortContent = shortContent.toLowerCase();
-			
-			if(shortContent.contains("description"))
+		Pattern p_meta;    
+		Matcher m_meta;
+		for(String s : keyWords){
+			String regEx = "[\\s。]({1}[\\S^]*?"+s+"[\\S]*?[\\s。])"; 
+			p_meta = Pattern.compile(regEx,Pattern.CASE_INSENSITIVE);
+			m_meta = p_meta.matcher(content);    
+			while(m_meta.find())
 			{
-				int start = shortContent.indexOf("content=")+9;
-			
-				shortContent = (String) shortContent.
-					subSequence(start, shortContent.length());
-				int end = shortContent.indexOf("\"");
-				shortContent =  (String) shortContent.subSequence(0, end);
-				break;
-			}			
+				shortContent = m_meta.group();   
+				shortContent = shortContent.toLowerCase();
+				
+				if(shortContent.contains("description"))
+				{
+					int start = shortContent.indexOf("content=")+9;
+				
+					shortContent = (String) shortContent.
+						subSequence(start, shortContent.length());
+					int end = shortContent.indexOf("\"");
+					shortContent =  (String) shortContent.subSequence(0, end);
+					break;
+				}			
+			}
 		}
 		
 		return new Result(title, shortContent, url, date);
 	}
 	
 	public static void main(String[] args) {
-		String target1 = "<meta name=\"Description\" content=\"新浪网为全球用户24小。\" /> ";
-		String target2 = "<META content=\"关注搜索门户的最新动态、把握垂直搜索的发展趋势。\" name=description>";
+		String target1 = "<meta name=\"Description\" 中国网为全球用户24小。\" /> ";
+		String target2 = " 关注教育门户的最新动态、把握垂直搜索的发展趋势。\" name=description>";
+		target1  += target2;
+		String s1 = "中国";
+		String s2 ="教育"; 
+		ArrayList<String>words = new ArrayList<String>();
+		words.add(s1);
+		words.add(s2);
 		
-		String regEx = "<meta[\\s\\S]*?>";    
-		Pattern p_title = Pattern.compile(regEx,Pattern.CASE_INSENSITIVE);
-		Matcher m_title = p_title.matcher(target1);
+		//开始产生内容提示\
+		String content ="";
 		
-		String description = "description";
-		
-		//获得META的数据
-		while(m_title.find())
-		{
-			String desp = m_title.group();
-			System.out.println(desp);
-			
-			desp = desp.toLowerCase();
-			if(desp.contains(description))
-				System.out.println("包含description");
-
-			//找到content以及两个""
-			int start = desp.indexOf("content=")+9;
-			System.out.println(start);
-			System.out.println(desp.charAt(start));
-			
-			desp = (String) desp.subSequence(start, desp.length());
-			int end = desp.indexOf("\"");
-			System.out.println("the end of \" is " + end);
-			desp =  (String) desp.subSequence(0, end);
-			System.out.println("最后的结果");
-			System.out.println(desp);		
+		Pattern p_meta;    
+		Matcher m_meta;
+		for(String s : words){
+			String regEx = "[\\s。]{1}[\\S]*?"+s+"[\\S]*?[\\s。]"; 
+			p_meta = Pattern.compile(regEx,Pattern.CASE_INSENSITIVE);
+			m_meta = p_meta.matcher(target1);    
+			while(m_meta.find())
+			{
+				content += m_meta.group();   
+			}
 		}
+		System.out.println("content:"+content);
 	}
 	
 	

@@ -43,24 +43,12 @@ public class DictSegment {
 	//流程，从htmlDoc中读取句子S，如果没有S了，算法结束
 	//如果还有，读取S，调用句子切词程序，切完继续读取S
 	//后续处理：剔除停用词，统计
-	public HashMap<String,DocPos> SegmentFile(String htmlDoc)
+	public HashMap<String,DocPos> SegmentFile(String htmlText,String titleSentance)
 	{
 		//第一步操作，把html的文件用正则表达式处理，去掉标签等无用信息，保留文本进行操作
-		HtmlParser parser = new HtmlParser();
-		String temp=null;
 		Date st1 = new Date();
-		try {
-			temp = (new String(htmlDoc.getBytes("GBK"),parser.htmlCode(htmlDoc)));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		Date st2 = new Date();
-		String htmlText = parser.html2Text(temp);
-		String titleSentance = parser.htmlTitle(temp);
-		Date st3 = new Date();
 		//断句cutIntoSentance，把句子传到cutIntoWord，然后获得返回值
 		HashMap<String,DocPos> segResult = new HashMap<String,DocPos>();
-		
 		if(titleSentance!=null){
 			ArrayList<String> titles = cutIntoWord(titleSentance, true);
 			for(String s : titles){
@@ -76,10 +64,9 @@ public class DictSegment {
 				
 			}
 		}
-		Date st4 = new Date();
+		Date st2 = new Date();
 		ArrayList<String> sentances = cutIntoSentance(htmlText);
-		Date st5 = new Date();
-		
+		Date st3 = new Date();
 		for(int i = 0; i < sentances.size(); i++)
 		{
 			ArrayList<String> words = cutIntoWord(sentances.get(i), true);
@@ -98,16 +85,10 @@ public class DictSegment {
 		Date st6 = new Date();
 		long s1 = st2.getTime()-st1.getTime();
 		long s2 = st3.getTime()-st2.getTime();
-		long s3 = st4.getTime()-st3.getTime();
-		long s4 = st5.getTime()-st4.getTime();
-		long s5 = st6.getTime()-st5.getTime();
 		long s6 = st6.getTime()-st1.getTime();
-		System.out.print("编码耗时:"+s1+"ms");
-		System.out.print("\t提取标题和正文耗时:"+s2+"ms");
-		System.out.print("\t分标题和加索引耗时:"+s3+"ms");
-		System.out.print("\t分词正文耗时:"+s4+"ms");
-		System.out.print("\t加索引耗时:"+s5+"ms");
-		System.out.println("\t总耗时:"+s6+"ms");
+//		System.out.print("加标题耗时:"+s1+"ms");
+//		System.out.print("\t加正文耗时:"+s2+"ms");
+//		System.out.println("\t总耗时:"+s6+"ms");
 		return segResult;
 	}
 	

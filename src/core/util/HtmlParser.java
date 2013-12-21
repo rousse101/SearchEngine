@@ -101,8 +101,8 @@ public Date parseNewsTime(String url, String htmlDoc) {
 	{    	
 		String htmlStr = inputString; //含html标签的字符串    
 		String textStr ="";    
-		Pattern p_script,p_style,p_html,p_href,p_filter;    
-		Matcher m_script,m_style,m_html,m_href,m_filter;      
+		Pattern p_script,p_style,p_html,p_href,p_filter,p_com;    
+		Matcher m_script,m_style,m_html,m_href,m_filter,m_com;      
 	          
 	    try { 
 	    	//定义script正则式{或<script[^>]*?>[\s\S]*?<\/script> } 
@@ -110,12 +110,16 @@ public Date parseNewsTime(String url, String htmlDoc) {
 	    	//定义style正则式{或<style[^>]*?>[\s\S]*?<\/style> }    
 	    	String regEx_style = "<style[^>]*?>[\\s\\S]*?</style>"; 
 	    	String regEx_href = "<a[^>]*?>[\\s\\S]*?</a>"; 
-	    	
+	    	String regEx_com = "<!--[^>]*?[\\s\\S]*?-->"; 
 	    	
 	    	//定义HTML标签的正则表达式 
 	    	String regEx_html = "<[^>]+>";
-	        String[] filter = {"&quot;", "&nbsp;","&lt;","&gt;"};
-	    	
+	        String[] filter = {"&quot;", "&nbsp;","&lt;","&gt;","\\s{2,}","\n"};
+	       
+	        p_com = Pattern.compile(regEx_com,Pattern.CASE_INSENSITIVE);    
+	        m_com = p_com.matcher(htmlStr);    
+	        htmlStr = m_com.replaceAll(""); //过滤script标签    
+	        
 	        p_script = Pattern.compile(regEx_script,Pattern.CASE_INSENSITIVE);    
 	        m_script = p_script.matcher(htmlStr);    
 	        htmlStr = m_script.replaceAll(""); //过滤script标签    
@@ -137,7 +141,7 @@ public Date parseNewsTime(String url, String htmlDoc) {
 	        {
 	        	p_filter = Pattern.compile(filter[i],Pattern.CASE_INSENSITIVE);    
 	        	m_filter = p_filter.matcher(htmlStr);    
-		        htmlStr = m_filter.replaceAll(""); 
+		        htmlStr = m_filter.replaceAll(" "); 
 	        }
 	        
 	        textStr = htmlStr;    

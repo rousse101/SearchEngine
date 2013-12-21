@@ -31,32 +31,31 @@ originalPageGetter类实现根据输入参数从原始raws文件中读取网页的功能
 
 public class originalPageGetter {
 
-	private String url="";
-	private DBConnection dbc = new DBConnection();
-	private MD5 md5 = new MD5();
-	private String date="";
-	private String urlFromHead="";
+	private String lengthFromHead;
+	private String dateFromHead;
+	private String titleFromHead;
+	private String urlFromHead;
 	private Configuration conf = new Configuration();
 	
-	public originalPageGetter()
-	{	}
 	
-	public originalPageGetter(String url)
-	{
-		this.url = url;
+	
+	public String getDateFromHead() {
+		return dateFromHead;
 	}
-	
-	public void setUrl(String url)
-	{
-		this.url = url;
+
+	public void setDateFromHead(String dateFromHead) {
+		this.dateFromHead = dateFromHead;
 	}
-	
-	public String getDate()
-	{
-		return date;
+
+	public String getTitleFromHead() {
+		return titleFromHead;
 	}
-	
-	public String getPage()
+
+	public void setTitleFromHead(String titleFromHead) {
+		this.titleFromHead = titleFromHead;
+	}
+
+	public String getPage(String url)
 	{
 		Page page = getRawsInfo(url);
 		String content = "";
@@ -66,7 +65,7 @@ public class originalPageGetter {
 			tfileName.append(page.getRawName());
 			tfileName.insert(4, "\\");
 			String fileName = conf.getValue
-				("RAWSPATH")+"\\"+tfileName.toString();
+				("INDEXPATH")+"\\"+tfileName.toString();
 			
 			FileReader fileReader = new FileReader(fileName);
 			BufferedReader bfReader = new BufferedReader(fileReader);
@@ -74,8 +73,10 @@ public class originalPageGetter {
 			String word;
 			bfReader.skip(page.getOffset());
 			
-			int sr = readRawOffset(bfReader);
-			content = readRawContent(bfReader,sr);
+			readRawHead(bfReader);
+			content = readRawContent(bfReader);
+			
+			MD5 md5 = new MD5();
 			String contentMD5 = md5.getMD5ofStr(content);
 			
 			if(contentMD5.equals(page.getConnent()))
@@ -102,18 +103,17 @@ public class originalPageGetter {
 			//从数据库中读出的文件名中不含有分隔符，需要预处理一下
 			StringBuffer tfileName = new StringBuffer();
 			tfileName.append(file);
-			tfileName.insert(4, "\\");
 			String fileName = conf.getValue
-			("RAWSPATH")+"\\"+tfileName.toString();
+			("INDEXPATH")+"\\Index\\"+tfileName.toString();
 			
 			FileReader fileReader = new FileReader(fileName.toString());
 			bfReader = new BufferedReader(fileReader);
 
-			String word;
-			bfReader.skip(offset);
-			int ro = readRawOffset(bfReader);
-			content = readRawContent(bfReader,ro);
+			for(int i =0;i<offset*6;i++)bfReader.readLine();
+			readRawHead(bfReader);
+			content = readRawContent(bfReader);
 			bfReader.close();
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -132,6 +132,7 @@ public class originalPageGetter {
 	
 	public Page getRawsInfo(String url)
 	{
+		DBConnection dbc = new DBConnection();
 		String sql = " select * from pageindex where url='"+url+"' ";
 		ResultSet rs = dbc.executeQuery(sql);
 		
@@ -145,7 +146,6 @@ public class originalPageGetter {
 				connent = rs.getString("connent"); // 选择connent这列数据
 				offset = Integer.parseInt(rs.getString("offset")); // 选择offset这列数据
 				raws = rs.getString("raws"); // 选择connent这列数据
-				
 			}
 			
 			return new Page(url, offset, connent, raws);
@@ -155,70 +155,44 @@ public class originalPageGetter {
 		
 		return null;
 	}
-	private int readRawOffset(BufferedReader bfReader)
-	{		
-		int offset=0;
-		try{
-		//String urlLine = null;
-			bfReader.readLine();    //version
-			bfReader.readLine();    //url
-			bfReader.readLine();	//date
-			bfReader.readLine();    //ip
-			String s= bfReader.readLine();
-			s = s.substring(s.indexOf(":")+1, s.length());
-			offset = Integer.parseInt(s);
-			bfReader.readLine();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
-		return offset;
-	}
+	
 	private String readRawHead(BufferedReader bfReader)
 	{		
 		//String urlLine = null;
-		String headStr = "";
 		try {	
-			bfReader.readLine();    //version
 			urlFromHead = bfReader.readLine();
-			System.out.println("url:"+urlFromHead);
-			headStr += urlFromHead;
 			if(urlFromHead != null)
 				urlFromHead = urlFromHead.substring(urlFromHead.indexOf(":")+1, urlFromHead.length());
 			
-			date = bfReader.readLine();	
-			headStr += date;
-			if(date != null)
-				date = date.substring(date.indexOf(":")+1, date.length());
+			dateFromHead = bfReader.readLine();	
+			if(dateFromHead != null)
+				dateFromHead = dateFromHead.substring(dateFromHead.indexOf(":")+1, dateFromHead.length());
 			
-			String temp;
-			while(!(temp = bfReader.readLine()).trim().isEmpty())
-			{ 
-				headStr += temp;
-			}		
+			titleFromHead = bfReader.readLine();	
+			if(titleFromHead != null)
+				titleFromHead = titleFromHead.substring(titleFromHead.indexOf(":")+1, titleFromHead.length());
+			
+			lengthFromHead = bfReader.readLine();	
+			if(lengthFromHead != null)
+				lengthFromHead = lengthFromHead.substring(lengthFromHead.indexOf(":")+1, lengthFromHead.length());
+			
+			bfReader.readLine();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
-		return headStr;
+		return lengthFromHead;
 	}
 	
-	private String readRawContent(BufferedReader bfReader,int rawoffset)
+	private String readRawContent(BufferedReader bfReader)
 	{
-		StringBuffer strBuffer = new StringBuffer(rawoffset);		
-		try {		
-			String word;
-			while((word = bfReader.readLine()) != null)
-			{
-				if(word.trim().isEmpty())
-					break;
-				else
-					strBuffer.append(word + "\n");
-			}
+		String content=null;
+		try {
+			content = bfReader.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return strBuffer.toString();
+		return content;
 	}
 	
 }
