@@ -6,7 +6,14 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 %>
-
+<%	
+		//String keyword = new String(request.getParameter("keyword").getBytes("ISO-8859-1"),"GB2312");
+		String keyword=(String)session.getAttribute("keyword");
+		System.out.println("keyword is "+keyword);
+		int totalnum=(Integer)session.getAttribute("pagenum");
+		int curnum=(Integer)session.getAttribute("curnum");
+		ArrayList<Result> results=(ArrayList<Result>)session.getAttribute("results"); 	
+%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
@@ -30,17 +37,46 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
   </head>
   
-  <body>
-    
-    <%	
-		//String keyword = new String(request.getParameter("keyword").getBytes("ISO-8859-1"),"GB2312");
-		String keyword=(String)session.getAttribute("keyword");
-		int totalnum=(Integer)session.getAttribute("pagenum");
-		int curnum=(Integer)session.getAttribute("curnum");
-		ArrayList<Result> results=(ArrayList<Result>)session.getAttribute("results"); 	
-	%>
+  <body onload="okload('<%=keyword %>');">
 	
 	<script type="text/javascript">
+	
+	function okload(words) {
+	 	//alert(words);
+	 	var keyss = words;
+	 	//document.getElementById("keywordjs").value;   //可以设置一个隐藏域存储关键词
+		var keys = keyss.split("+");
+		var bookmark;
+		if(document.createRange){
+			var range = document.createRange();
+		}
+		else{
+			var range = document.body.createTextRange();
+			bookmark = range.getBookmark();
+		}
+		var key;
+		for(var i = 0;key = keys[i];i++){
+			if(range.findText){
+				range.collapse(true);
+				range.moveToBookmark(bookmark);
+				while(range.findText(key)){
+					range.pasteHTML(range.text.fontcolor("#ff0000"));
+				}
+			}else{
+				var s,n;
+				s = window.getSelection();
+				s.collapse(document.body,0);
+				while(window.find(key)){
+					var n = document.createElement("SPAN");
+					n.style.color="#ff0000";
+					s.getRangeAt(0).surroundContents(n);
+				}
+			}
+		}
+	 }
+	
+	
+	
 	var xmlHttpRequest;
 	
 	function createXmlHttpRequest()
@@ -150,6 +186,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				query.focus();
 			}
 	}
+	
 </script>
 
 	<a href ="Search?keyword=<%=keyword%>&model=1&CurrentNum=1">按时间排序</a>

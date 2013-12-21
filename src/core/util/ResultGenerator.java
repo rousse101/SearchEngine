@@ -48,7 +48,7 @@ public class ResultGenerator {
 			m_meta = p_meta.matcher(content);    
 			while(m_meta.find())
 			{
-				shortContent = m_meta.group();   
+				shortContent = m_meta.group(1);   
 				shortContent = shortContent.toLowerCase();
 			}
 		}
