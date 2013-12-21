@@ -136,7 +136,7 @@ public class RawsAnalyzer {
 //				System.out.println("the offset in " + fileName +" is: " + offset);
 //				System.out.println("the url is " + url);
 				
-				page.setPage(Rawurl, oldOffset, contentMD5, myfile);
+				page.setPage(Rawurl, oldOffset, contentMD5, myfile,Rawtime);
 				page.add2DB(dbc);
 			}	
 			bfWriter.close();

@@ -33,9 +33,9 @@ public class Response {
 	public int getResultSize(){
 		return num;
 	}
-	public ArrayList<Result> getResponse(String request,int n)
+	public ArrayList<Result> getResponse(String request,int n,int model)
 	{
-		doQuery(request,n);
+		doQuery(request,n,model);
 		return results;
 	}
 	
@@ -49,7 +49,7 @@ public class Response {
 	//注意点：
 	//1. 考虑性能的问题，如果网页库比较大，很可能回到只查询的缓慢和资源的大量消耗
 	//2. 考虑网页的排名问题
-	private void doQuery(String request,int N) {
+	private void doQuery(String request,int N,int model) {
 		
 		//1. 关键词分词、剔除停用词，并对分词结果进行查找对应的结果
 		//2. 合并各个分词的结果，返回初步的网页URL信息
@@ -78,6 +78,7 @@ public class Response {
 				//对已经计算得分的文档排序
 				//TODO 后续可以考虑控制返回文档的量级。
 				ArrayList<String>temp = invertedIndex.SortDoc(resultUrl);
+				if(model==1)temp = invertedIndex.SortBytime(temp);
 				this.num = temp.size();
 				int end = N*10 >temp.size() ? temp.size() : N*10;
 				for(int i =(N-1)*10 ;i <end; i ++){
@@ -133,7 +134,7 @@ public class Response {
 
 		Response response = new Response();
 		for(int i =0;i<10;i++){
-		ArrayList<Result> results = response.getResponse("中国",1);
+		ArrayList<Result> results = response.getResponse("中国",1,0);
 		
 		System.out.println("返回结果如下：");
 		for(Result result : results)

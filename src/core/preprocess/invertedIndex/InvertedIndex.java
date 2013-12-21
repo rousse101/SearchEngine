@@ -10,6 +10,9 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,6 +27,7 @@ import configure.Configuration;
 import sun.misc.Compare;
 
 import core.preprocess.forwardIndex.ForwardIndex;
+import core.util.DBConnection;
 
 /************************************************* 
 InvertedIndex类建立网页倒排索引，对应关系为词组映射url，通过正向索引来建立
@@ -232,6 +236,56 @@ public class InvertedIndex {
 		ByValueComparator bvc = new ByValueComparator(urls);
 		Collections.sort(result,bvc);
 		return result;
+	}
+	
+	class ByTimeComparator implements Comparator<String> {
+		HashMap<String, Date> here;
+		public ByTimeComparator(HashMap<String, Date> urls){
+			here  = urls;
+		}
+		public int compare(String o1, String o2) {
+			if(here.containsKey(o1)&&here.containsKey(o2)){
+				if(here.get(o1).compareTo(here.get(o2))<0)return 1;
+				else return -1;
+			}
+			else{
+				return 0;
+			}
+		}
+	}
+	
+	private ArrayList <String> SortTime(HashMap<String,Date> urls){
+		ArrayList<String> result = new ArrayList<String>(urls.keySet());
+		ByTimeComparator bvc = new ByTimeComparator(urls);
+		Collections.sort(result,bvc);
+		System.out.println("over sort time");
+		return result;
+	}
+	public ArrayList<String> SortBytime(ArrayList<String> urls){
+		HashMap<String,Date> sortmap = new HashMap<String,Date>(urls.size());
+		DBConnection dbc = new DBConnection();
+		DateFormat df= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		for(String url :urls){
+			String sql = "select * from pageindex where url ='"+url+"'";
+			ResultSet rs = dbc.executeQuery(sql);
+			try{
+				if(rs.next())
+					{
+						String date = rs.getString("pagetime"); // 选择sname这列数据
+						Date time =null;
+						try {
+							time = df.parse(date);
+						} catch (ParseException e) {
+						}
+						sortmap.put(url, time);
+					}
+			rs.close();
+			}catch(SQLException s){
+				s.printStackTrace();
+			}
+		}
+		dbc.close();
+		return SortTime(sortmap);
 	}
 	
 	/**

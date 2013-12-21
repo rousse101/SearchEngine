@@ -54,7 +54,7 @@ public class SearchServlet extends HttpServlet {
 		String curnum = new String(request.getParameter("CurrentNum").getBytes("ISO-8859-1"),"GB2312"); 
 		int md =Integer.parseInt(model);
 		int cn = Integer.parseInt(curnum);
-		ArrayList<Result> results = rp.getResponse(keyword,cn);
+		ArrayList<Result> results = rp.getResponse(keyword,cn,md);
 		int tn = rp.getResultSize();
 		request.getSession().setAttribute("results", results);
 		request.getSession().setAttribute("keyword", keyword);
