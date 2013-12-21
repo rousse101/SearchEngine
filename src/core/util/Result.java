@@ -6,17 +6,21 @@ public class Result {
 	private String content;
 	private String url;
 	private String date;
-	
-	public Result(String title, String content, String url, String date)
+	private String view;
+	public Result(String title, String content, String url, String date,String view)
 	{
 		this.title = title;
 		this.content = content;
 		this.url = url;
 		this.date = date;
+		this.view = view;
 	}
 	
 	
-	
+	public String getView() {
+		return view;
+	}
+
 	public String getTitle() {
 		return title;
 	}

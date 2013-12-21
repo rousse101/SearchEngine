@@ -8,10 +8,6 @@
     <servlet-name>SearchServlet</servlet-name>
     <servlet-class>core.webServlet.SearchServlet</servlet-class>
   </servlet>
-<servlet>
-    <servlet-name>getPreviewContent</servlet-name>
-    <servlet-class>core.webServlet.getPreviewContent</servlet-class>
- </servlet>
 
 <servlet>
     <servlet-name>AutoComplete</servlet-name>
@@ -21,10 +17,6 @@
  <servlet-mapping>
     <servlet-name>AutoComplete</servlet-name>
     <url-pattern>/AutoComplete</url-pattern>
-  </servlet-mapping>
-<servlet-mapping>
-    <servlet-name>getPreviewContent</servlet-name>
-    <url-pattern>/getPreviewContent</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>SearchServlet</servlet-name>
