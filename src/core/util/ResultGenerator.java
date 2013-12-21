@@ -27,12 +27,12 @@ public class ResultGenerator {
 		Pattern p_meta;    
 		Matcher m_meta;
 		for(String s: keyWords){
-			String regEx = "[\\s。]{1}([\\S^。])*?("+s+")([\\S]*?[\\s。])"; 
+			String regEx = "[\\s]{0,1}(\\S*?"+s+"(?:[\\S]*?。)+)"; 
 			p_meta = Pattern.compile(regEx,Pattern.CASE_INSENSITIVE);
 			m_meta = p_meta.matcher(content);    
 			while(m_meta.find())
 				{
-					shortContent = m_meta.group(1)+m_meta.group(2)+m_meta.group(3);   
+					shortContent += m_meta.group(1);   
 					shortContent = shortContent.toLowerCase();
 				}
 		}
@@ -56,7 +56,6 @@ public class ResultGenerator {
 		title = pageGetter.getTitleFromHead();
 		
 		String view = view(content,keyWords);
-		System.out.println("view"+view);
 		//开始产生内容提示
 		Pattern p_meta;    
 		Matcher m_meta;
@@ -75,8 +74,8 @@ public class ResultGenerator {
 	}
 	
 	public static void main(String[] args) {
-		String target1 = "<meta name=\"Description\" 中国网为全球用户24小。\" /> ";
-		String target2 = " 关注教育门户的最新动态、把握垂直搜索的发展趋势。          我的世界的。 | 一  二 \" name=description>";
+		String target1 = "fefe 中国网为全球用户24小。\" /> ";
+		String target2 = " 关注教育门户的最新动态、把握垂直搜索的发展趋。我的世界的。 | 一  二 \" name=description>";
 		target1  += target2;
 		String s1 = "中国";
 		String s2 ="教育"; 
@@ -90,12 +89,12 @@ public class ResultGenerator {
 		Pattern p_meta;    
 		Matcher m_meta;
 		for(String s : words){
-			String regEx = "[\\s]{1}[^。\\S]*?[\\S]*?[。]"; 
+			String regEx = "[\\s]{0,1}(\\S*?"+s+"(?:[\\S]*?。)+)"; 
 			p_meta = Pattern.compile(regEx,Pattern.CASE_INSENSITIVE);
 			m_meta = p_meta.matcher(target1);    
 			while(m_meta.find())
 			{
-				content += m_meta.group();   
+				content += m_meta.group(1);   
 			}
 		}
 		System.out.println("content:"+content);
