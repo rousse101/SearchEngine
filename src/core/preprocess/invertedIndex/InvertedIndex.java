@@ -52,12 +52,28 @@ public class InvertedIndex {
 	public int GetTotalDocNum(){
 		return N;
 	}
+	public ArrayList<String> TermList(String keytag){
+		ArrayList<String> term = new ArrayList<String>(10);
+		for (Iterator iter = invertedIndexMap.entrySet().iterator(); iter.hasNext();) 
+		{
+			Map.Entry entry = (Map.Entry) iter.next(); // map.entry 同时取出键值对
+			String word = (String) entry.getKey();
+			if(word.startsWith(keytag)){
+				term.add(word);
+			}
+			if(term.size()==10){
+				break;
+			}
+		}
+		return term;
+	}
 	public Boolean WriteIndex(HashMap<String, HashMap<String,DocPos>> invertedIndexMap,int N){
 		try {
 			Configuration conf = new Configuration();
 			FileOutputStream outStream = new FileOutputStream(conf.getValue("INDEXPATH")+"\\Index\\Index.txt");
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream); 
 			objectOutputStream.writeInt(N);
+			objectOutputStream.writeInt(invertedIndexMap.size());
 			objectOutputStream.writeObject(invertedIndexMap);
 			objectOutputStream.close();
 		} catch (IOException e) {
@@ -68,13 +84,14 @@ public class InvertedIndex {
 	}
 	public Boolean ReaderIndex(){
 		
-		invertedIndexMap =new  HashMap<String, HashMap<String,DocPos>>();
 		Configuration conf = new Configuration();
 		try {
 			FileInputStream freader = new FileInputStream(conf.getValue("INDEXPATH")+"\\Index\\Index.txt");
 			ObjectInputStream objectInputStream = new ObjectInputStream(freader);
 			try {
 				this.N= objectInputStream.readInt();
+				int num = objectInputStream.readInt();
+				invertedIndexMap =new  HashMap<String, HashMap<String,DocPos>>(num);
 				invertedIndexMap = (HashMap<String, HashMap<String,DocPos>>)objectInputStream.readObject();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();

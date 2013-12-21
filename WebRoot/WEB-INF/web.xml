@@ -9,6 +9,16 @@
     <servlet-class>core.webServlet.SearchServlet</servlet-class>
   </servlet>
 
+<servlet>
+    <servlet-name>AutoComplete</servlet-name>
+    <servlet-class>core.webServlet.AutoComplete</servlet-class>
+  </servlet>
+
+ <servlet-mapping>
+    <servlet-name>AutoComplete</servlet-name>
+    <url-pattern>/AutoComplete</url-pattern>
+  </servlet-mapping>
+
   <servlet-mapping>
     <servlet-name>SearchServlet</servlet-name>
     <url-pattern>/Search</url-pattern>
